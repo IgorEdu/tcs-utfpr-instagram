@@ -26,6 +26,9 @@ public class UsuarioController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private com.utfpr.tcs.instagram.services.TokenBlacklistService tokenBlacklistService;
+
     @PostMapping
     public ResponseEntity<?> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
         try {
@@ -79,6 +82,26 @@ public class UsuarioController {
             return ResponseEntity.ok(new TokenResponseDTO(token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Token não fornecido.");
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            // Decodifica o tempo de vida restante
+            java.time.Instant expiracao = tokenService.getExpirationDate(token);
+            // Insere fisicamente no cache Redis com o TTL correspondente
+            tokenBlacklistService.adicionar(token, expiracao);
+
+            return ResponseEntity.ok().body("Sessão encerrada com sucesso.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Token JWT inválido ou corrompido.");
         }
     }
 

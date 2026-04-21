@@ -43,6 +43,19 @@ public class TokenService {
         }
     }
 
+    public Instant getExpirationDate(String tokenJWT) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("instagram-api")
+                    .build()
+                    .verify(tokenJWT)
+                    .getExpiresAtAsInstant();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Token JWT inválido ou expirado matemático.");
+        }
+    }
+
     private Instant dataExpiracao() {
         return LocalDateTime.now().plusMinutes(15).toInstant(ZoneOffset.of("-03:00"));
     }

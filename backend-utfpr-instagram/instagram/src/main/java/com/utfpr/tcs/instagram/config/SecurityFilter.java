@@ -24,13 +24,20 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     private UsuarioRepository repository;
 
+    @Autowired
+    private com.utfpr.tcs.instagram.services.TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-            // Nota de Arquitetura Spec: É neste ponto exato que nós faremos a 
-            // interceptação comparando o 'tokenJWT' com a Blacklist no futuro.
+            // Nota de Arquitetura Spec: Bloqueio estrito baseado em cache statful
+            if (tokenBlacklistService.isRevogado(tokenJWT)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Sessão finalizada. Este token foi revogado no sistema!");
+                return;
+            }
 
             try {
                 var subject = tokenService.getSubject(tokenJWT);
