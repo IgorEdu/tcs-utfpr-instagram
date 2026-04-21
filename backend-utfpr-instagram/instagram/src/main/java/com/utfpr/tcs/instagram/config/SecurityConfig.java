@@ -23,8 +23,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    // Liberação do Swagger Universal
-                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    // Liberação do Swagger Universal e de Arquivos JSON estáticos
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/*.json").permitAll();
                     
                     // Liberação Base ditada na Spec
                     req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
