@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.utfpr.tcs.instagram.dtos.LoginDTO;
+import com.utfpr.tcs.instagram.dtos.TokenResponseDTO;
+import com.utfpr.tcs.instagram.services.CriptografiaService;
+import com.utfpr.tcs.instagram.services.TokenService;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -15,6 +19,12 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService service;
+
+    @Autowired
+    private CriptografiaService criptografiaService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
@@ -53,6 +63,23 @@ public class UsuarioController {
     public ResponseEntity<java.util.List<UsuarioDTO>> listar() {
         var listaUsuariosDto = service.listarTodos().stream().map(UsuarioDTO::new).toList();
         return ResponseEntity.ok(listaUsuariosDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO) {
+        try {
+            Usuario usuario = service.obterPorUsuario(loginDTO.getUsuario());
+
+            boolean senhaCorreta = criptografiaService.verificarSenha(loginDTO.getSenha(), usuario.getSenha());
+            if (!senhaCorreta) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+            }
+
+            String token = tokenService.gerarToken(usuario.getUsuario());
+            return ResponseEntity.ok(new TokenResponseDTO(token));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+        }
     }
 
     @GetMapping("/{id}")

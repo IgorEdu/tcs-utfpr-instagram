@@ -91,4 +91,10 @@ public class UsuarioService {
         return repository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     }
+
+    public Usuario obterPorUsuario(String username) {
+        return repository.findByUsuario(username)
+                .filter(Usuario::getAtivo)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado ou inativo."));
+    }
 }
