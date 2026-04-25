@@ -26,6 +26,7 @@ public class TokenService {
                     .withIssuer("instagram-api")
                     .withSubject(usuario.getUsuario())
                     .withClaim("role", Boolean.TRUE.equals(usuario.getIsAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
+                    .withIssuedAt(Instant.now())
                     .withExpiresAt(dataExpiracao())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
