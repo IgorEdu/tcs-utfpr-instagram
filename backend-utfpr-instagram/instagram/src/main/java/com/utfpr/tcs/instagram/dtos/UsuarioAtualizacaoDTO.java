@@ -1,24 +1,11 @@
 package com.utfpr.tcs.instagram.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class UsuarioAtualizacaoDTO {
-
-    @JsonProperty("nome_completo")
-    private String nomeCompleto;
-
-    private String usuario;
-
-    @Email(message = "Formato de e-mail inválido")
-    private String email;
-
-    private String biografia;
-
-    @JsonProperty("foto")
-    private String fotoUrl;
-
-    private String senha;
+@EqualsAndHashCode(callSuper = true)
+public class UsuarioAtualizacaoDTO extends UsuarioBaseDTO {
+    // Vazio! Ele herda todos os limites de tamanho e regex da UsuarioBaseDTO
+    // sem tornar nada obrigatoriamente forçado (@NotBlank)
 }

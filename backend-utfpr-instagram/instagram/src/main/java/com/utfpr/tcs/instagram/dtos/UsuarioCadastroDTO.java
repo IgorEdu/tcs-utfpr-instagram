@@ -1,29 +1,30 @@
 package com.utfpr.tcs.instagram.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class UsuarioCadastroDTO {
-    
+@EqualsAndHashCode(callSuper = true)
+public class UsuarioCadastroDTO extends UsuarioBaseDTO {
+
     @NotBlank(message = "O nome completo é obrigatório")
-    @JsonProperty("nome_completo")
-    private String nomeCompleto;
+    @Override
+    public String getNomeCompleto() { return super.getNomeCompleto(); }
 
     @NotBlank(message = "O nome de usuário é obrigatório")
-    private String usuario;
+    @Override
+    public String getUsuario() { return super.getUsuario(); }
 
     @NotBlank(message = "O e-mail é obrigatório")
-    @Email(message = "Formato de e-mail inválido")
-    private String email;
+    @Override
+    public String getEmail() { return super.getEmail(); }
 
-    private String biografia;
-
-    @JsonProperty("foto")
-    private String fotoUrl;
+    @NotBlank(message = "A biografia é obrigatória no cadastro")
+    @Override
+    public String getBiografia() { return super.getBiografia(); }
 
     @NotBlank(message = "A senha é obrigatória")
-    private String senha;
+    @Override
+    public String getSenha() { return super.getSenha(); }
 }
