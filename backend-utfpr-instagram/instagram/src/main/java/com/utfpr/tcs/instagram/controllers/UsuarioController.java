@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.utfpr.tcs.instagram.dtos.LoginDTO;
 import com.utfpr.tcs.instagram.dtos.TokenResponseDTO;
+import com.utfpr.tcs.instagram.dtos.SucessoPadraoDTO;
+import com.utfpr.tcs.instagram.dtos.ListagemPadraoDTO;
 import com.utfpr.tcs.instagram.services.CriptografiaService;
 import com.utfpr.tcs.instagram.services.TokenService;
 
@@ -30,88 +32,98 @@ public class UsuarioController {
     private com.utfpr.tcs.instagram.services.TokenBlacklistService tokenBlacklistService;
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
-        try {
-            Usuario usuarioSalvo = service.cadastrar(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioDTO(usuarioSalvo));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
+        Usuario usuarioSalvo = service.cadastrar(dto);
+        SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
+            .codigo("CADASTRO_CONCLUIDO")
+            .mensagem("Usuário criado com sucesso.")
+            .dados(new UsuarioDTO(usuarioSalvo))
+            .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(sucesso);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody com.utfpr.tcs.instagram.dtos.UsuarioAtualizacaoDTO dto) {
-        try {
-            Usuario usuarioAtualizado = service.atualizar(id, dto);
-            return ResponseEntity.ok(new UsuarioDTO(usuarioAtualizado));
-        } catch (RuntimeException e) {
-            if (e.getMessage().equals("Usuário não encontrado.")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> atualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody com.utfpr.tcs.instagram.dtos.UsuarioAtualizacaoDTO dto) {
+        Usuario usuarioAtualizado = service.atualizar(id, dto);
+        SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
+            .codigo("ATUALIZACAO_CONCLUIDA")
+            .mensagem("Dados atualizados com sucesso.")
+            .dados(new UsuarioDTO(usuarioAtualizado))
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id) {
-        try {
-            service.deletar(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<SucessoPadraoDTO<Void>> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
+            .codigo("USUARIO_DESATIVADO")
+            .mensagem("Conta de usuário desativada com sucesso.")
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<UsuarioDTO>> listar() {
+    public ResponseEntity<SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>>> listar() {
         var listaUsuariosDto = service.listarTodos().stream().map(UsuarioDTO::new).toList();
-        return ResponseEntity.ok(listaUsuariosDto);
+        ListagemPadraoDTO<UsuarioDTO> listagem = ListagemPadraoDTO.<UsuarioDTO>builder()
+            .total(listaUsuariosDto.size())
+            .pagina(1)
+            .limite(Math.max(listaUsuariosDto.size(), 1))
+            .usuarios(listaUsuariosDto)
+            .build();
+        SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>> sucesso = SucessoPadraoDTO.<ListagemPadraoDTO<UsuarioDTO>>builder()
+            .codigo("LISTAGEM_CONCLUIDA")
+            .mensagem("Listagem de usuários recuperada.")
+            .dados(listagem)
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO) {
-        try {
-            Usuario usuario = service.obterPorUsuario(loginDTO.getUsuario());
+    public ResponseEntity<SucessoPadraoDTO<TokenResponseDTO>> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO) {
+        Usuario usuario = service.obterPorUsuario(loginDTO.getUsuario());
 
-            boolean senhaCorreta = criptografiaService.verificarSenha(loginDTO.getSenha(), usuario.getSenha());
-            if (!senhaCorreta) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
-            }
-
-            String token = tokenService.gerarToken(usuario);
-            return ResponseEntity.ok(new TokenResponseDTO(token));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+        boolean senhaCorreta = criptografiaService.verificarSenha(loginDTO.getSenha(), usuario.getSenha());
+        if (!senhaCorreta) {
+            throw new RuntimeException("Credenciais inválidas.");
         }
+
+        String token = tokenService.gerarToken(usuario);
+        SucessoPadraoDTO<TokenResponseDTO> sucesso = SucessoPadraoDTO.<TokenResponseDTO>builder()
+            .codigo("LOGIN_CONCLUIDO")
+            .mensagem("Autenticação realizada com sucesso.")
+            .dados(new TokenResponseDTO(token, new UsuarioDTO(usuario)))
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletRequest request) {
+    public ResponseEntity<SucessoPadraoDTO<Void>> logout(jakarta.servlet.http.HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body("Token não fornecido.");
+            throw new RuntimeException("Credenciais inválidas.");
         }
 
         String token = authHeader.replace("Bearer ", "");
-        try {
-            // Decodifica o tempo de vida restante
-            java.time.Instant expiracao = tokenService.getExpirationDate(token);
-            // Insere fisicamente no cache Redis com o TTL correspondente
-            tokenBlacklistService.adicionar(token, expiracao);
+        java.time.Instant expiracao = tokenService.getExpirationDate(token);
+        tokenBlacklistService.adicionar(token, expiracao);
 
-            return ResponseEntity.ok().body("Sessão encerrada com sucesso.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Token JWT inválido ou corrompido.");
-        }
+        SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
+            .codigo("SESSAO_ENCERRADA")
+            .mensagem("Logout realizado, token invalidado.")
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obterPorId(@PathVariable Long id) {
-        try {
-            Usuario usuario = service.obterPorId(id);
-            return ResponseEntity.ok(new UsuarioDTO(usuario));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> obterPorId(@PathVariable Long id) {
+        Usuario usuario = service.obterPorId(id);
+        SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
+            .codigo("RECURSO_RECUPERADO")
+            .mensagem("Usuário encontrado.")
+            .dados(new UsuarioDTO(usuario))
+            .build();
+        return ResponseEntity.ok(sucesso);
     }
 }
