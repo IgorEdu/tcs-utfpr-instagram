@@ -11,18 +11,21 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.utfpr.tcs.instagram.entities.Usuario;
+
 @Service
 public class TokenService {
 
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String gerarToken(String usuario) {
+    public String gerarToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("instagram-api")
-                    .withSubject(usuario)
+                    .withSubject(usuario.getUsuario())
+                    .withClaim("role", Boolean.TRUE.equals(usuario.getIsAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
                     .withExpiresAt(dataExpiracao())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {

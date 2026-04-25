@@ -45,8 +45,10 @@ public class SecurityFilter extends OncePerRequestFilter {
                 Usuario usuario = repository.findByUsuario(subject)
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-                // Autoridade Horizontal sem RBAC / Roles, passa-se a lista vazia
-                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, java.util.Collections.emptyList());
+                var authorities = Boolean.TRUE.equals(usuario.getIsAdmin()) 
+                        ? java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN")) 
+                        : java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"));
+                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (RuntimeException ex) {
                 // Se de erro no parsing, bloqueamos não logando o contexto. Spring devolve 401.

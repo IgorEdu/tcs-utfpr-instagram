@@ -36,6 +36,10 @@ public class Usuario {
     private String senha;
 
     @Builder.Default
+    @Column(name = "is_admin", nullable = false)
+    private Boolean isAdmin = false;
+
+    @Builder.Default
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 }

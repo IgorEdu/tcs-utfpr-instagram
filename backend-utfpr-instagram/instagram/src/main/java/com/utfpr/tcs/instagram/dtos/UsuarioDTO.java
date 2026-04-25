@@ -18,6 +18,9 @@ public class UsuarioDTO {
     @JsonProperty("foto")
     private String fotoUrl;
 
+    @JsonProperty("is_admin")
+    private Boolean isAdmin;
+
     public UsuarioDTO(Usuario obj) {
         this.id = obj.getId();
         this.nomeCompleto = obj.getNomeCompleto();
@@ -25,5 +28,6 @@ public class UsuarioDTO {
         this.email = obj.getEmail();
         this.biografia = obj.getBiografia();
         this.fotoUrl = obj.getFotoUrl();
+        this.isAdmin = obj.getIsAdmin();
     }
 }

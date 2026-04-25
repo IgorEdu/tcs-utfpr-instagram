@@ -78,7 +78,7 @@ public class UsuarioController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
             }
 
-            String token = tokenService.gerarToken(usuario.getUsuario());
+            String token = tokenService.gerarToken(usuario);
             return ResponseEntity.ok(new TokenResponseDTO(token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
