@@ -1,87 +1,77 @@
 {
-   "openapi":"3.0.4",
-   "info":{
-      "title":"Instagram API - Gerenciamento de Usuários",
-      "description":"API REST de gerenciamento de usuários com autenticação JWT. Padrão de resposta: { status, codigo, mensagem, dados }.",
-      "version":"1.0.1"
+   "openapi": "3.0.4",
+   "info": {
+      "title": "Instagram API - Gerenciamento de Usuários",
+      "description": "API REST de gerenciamento de usuários com autenticação JWT. Padrão de resposta: { status, codigo, mensagem, dados }.",
+      "version": "1.0.1"
    },
-   "servers":[
+   "servers": [
       {
-         "url":"https://virtserver.swaggerhub.com/organizacao/usuarios-api/1.0.0",
-         "description":"SwaggerHub API Auto Mocking"
+         "url": "https://localhost:8080",
+         "description": "API - Instagram"
       }
    ],
-   "tags":[
+   "tags": [
       {
-         "name":"usuarios",
-         "description":"Operações relacionadas ao usuário"
+         "name": "usuarios",
+         "description": "Operações relacionadas ao usuário"
       },
       {
-         "name":"auth",
-         "description":"Operações de autenticação (login, logout, refresh token)"
+         "name": "login",
+         "description": "Operações de autenticação (login, logout)"
       }
    ],
-   "paths":{
-      "/usuarios/login":{
-         "post":{
-            "tags":[
-               "auth"
+   "paths": {
+      "/usuarios/login": {
+         "post": {
+            "tags": [
+               "login"
             ],
-            "summary":"Login do usuário",
-            "description":"Autentica o usuário com usuário e senha, retornando token JWT.",
-            "operationId":"loginUsuario",
-            "requestBody":{
-               "description":"Credenciais de acesso",
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/LoginRequest"
+            "summary": "Login do usuário",
+            "description": "Autentica o usuário com usuário e senha, retornando token JWT.",
+            "operationId": "loginUsuario",
+            "requestBody": {
+               "description": "Credenciais de acesso",
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/LoginRequest"
                      },
-                     "example":{
-                        "usuario":"joao",
-                        "senha":"123"
+                     "example": {
+                        "usuario": "joao",
+                        "senha": "123"
                      }
                   }
                },
-               "required":true
+               "required": true
             },
-            "responses":{
-               "200":{
-                  "description":"Login realizado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/LoginResponse"
+            "responses": {
+               "200": {
+                  "description": "Login realizado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/LoginResponse"
                         }
                      }
                   }
                },
-               "400":{
-                  "description":"Dados incompletos",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "400": {
+                  "description": "Dados incompletos",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "401":{
-                  "description":"Credenciais inválidas",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Usuário não existe",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "401": {
+                  "description": "Credenciais inválidas",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
@@ -89,54 +79,194 @@
             }
          }
       },
-      "/usuarios/refresh-token":{
-         "post":{
-            "tags":[
-               "auth"
+      "/usuarios/logout": {
+         "post": {
+            "tags": [
+               "login"
             ],
-            "summary":"Renovar token JWT",
-            "description":"Gera um novo access token a partir de um refresh token válido.",
-            "operationId":"refreshToken",
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/RefreshTokenRequest"
+            "summary": "Logout do usuário",
+            "description": "Encerrando a sessão do usuário e revoga acesso token JWT.",
+            "operationId": "logoutUsuario",
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/LogoutRequest"
                      },
-                     "example":{
-                        "refreshToken":"eyJhbGci..."
+                     "example": {
+                        "token": "eyJhbGci..."
                      }
                   }
                },
-               "required":true
+               "required": true
             },
-            "responses":{
-               "200":{
-                  "description":"Token renovado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/RefreshTokenResponse"
+            "responses": {
+               "200": {
+                  "description": "Logout realizado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/SucessoSimples"
                         }
                      }
                   }
                },
-               "400":{
-                  "description":"Dados incompletos",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "400": {
+                  "description": "Token não informado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "401":{
-                  "description":"Refresh token inválido ou expirado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "401": {
+                  "description": "Token inválido ou expirado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               }
+            },
+            "security": [
+               {
+                  "BearerAuth": []
+               }
+            ]
+         }
+      },
+      "/usuarios": {
+         "get": {
+            "tags": [
+               "usuarios"
+            ],
+            "summary": "Listar usuários",
+            "description": "Retorna a lista paginada de usuários cadastrados.",
+            "operationId": "listarUsuarios",
+            "parameters": [
+               {
+                  "name": "pagina",
+                  "in": "query",
+                  "description": "Número da página",
+                  "required": false,
+                  "schema": {
+                     "type": "integer",
+                     "default": 1
+                  }
+               },
+               {
+                  "name": "limite",
+                  "in": "query",
+                  "description": "Itens por página",
+                  "required": false,
+                  "schema": {
+                     "type": "integer",
+                     "default": 10
+                  }
+               }
+            ],
+            "responses": {
+               "200": {
+                  "description": "Usuários listados com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ListagemResponse"
+                        }
+                     }
+                  }
+               },
+               "401": {
+                  "description": "Token inválido ou expirado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Nenhum usuário encontrado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               }
+            },
+            "security": [
+               {
+                  "BearerAuth": []
+               }
+            ]
+         },
+         "post": {
+            "tags": [
+               "usuarios"
+            ],
+            "summary": "Cadastrar usuário",
+            "description": "Cria um novo usuário no sistema.",
+            "operationId": "cadastrarUsuario",
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/CadastroRequest"
+                     },
+                     "example": {
+                        "nome": "João",
+                        "email": "j@j.com",
+                        "usuario": "joao",
+                        "senha": "123"
+                     }
+                  }
+               },
+               "required": true
+            },
+            "responses": {
+               "201": {
+                  "description": "Usuário cadastrado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/CadastroResponse"
+                        }
+                     }
+                  }
+               },
+               "400": {
+                  "description": "Dados incompletos",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               },
+               "405": {
+                  "description": "Dados inválidos",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               },
+               "409": {
+                  "description": "Usuário já cadastrado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
@@ -144,714 +274,507 @@
             }
          }
       },
-      "/usuarios/logout":{
-         "post":{
-            "tags":[
-               "auth"
-            ],
-            "summary":"Logout do usuário",
-            "description":"Revoga o refresh token, encerrando a sessão do usuário.",
-            "operationId":"logoutUsuario",
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/RefreshTokenRequest"
-                     },
-                     "example":{
-                        "refreshToken":"eyJhbGci..."
-                     }
-                  }
-               },
-               "required":true
-            },
-            "responses":{
-               "200":{
-                  "description":"Logout realizado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/SucessoSimples"
-                        }
-                     }
-                  }
-               },
-               "400":{
-                  "description":"Refresh token não informado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               }
-            },
-            "security":[
-               {
-                  "BearerAuth":[
-                     
-                  ]
-               }
-            ]
-         }
-      },
-      "/usuarios":{
-         "get":{
-            "tags":[
+      "/usuarios/{id}": {
+         "get": {
+            "tags": [
                "usuarios"
             ],
-            "summary":"Listar usuários",
-            "description":"Retorna a lista paginada de usuários cadastrados.",
-            "operationId":"listarUsuarios",
-            "parameters":[
+            "summary": "Obter dados de um usuário",
+            "description": "Retorna os detalhes de um usuário específico baseado no ID fornecido.",
+            "operationId": "obterUsuarioPorId",
+            "parameters": [
                {
-                  "name":"pagina",
-                  "in":"query",
-                  "description":"Número da página",
-                  "required":false,
-                  "schema":{
-                     "type":"integer",
-                     "default":1
-                  }
-               },
-               {
-                  "name":"limite",
-                  "in":"query",
-                  "description":"Itens por página",
-                  "required":false,
-                  "schema":{
-                     "type":"integer",
-                     "default":10
+                  "name": "id",
+                  "in": "path",
+                  "description": "ID do usuário a ser recuperado",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
                   }
                }
             ],
-            "responses":{
-               "200":{
-                  "description":"Usuários listados com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ListagemResponse"
+            "responses": {
+               "200": {
+                  "description": "Usuário encontrado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/UsuarioUnicoResponse"
                         }
                      }
                   }
                },
-               "401":{
-                  "description":"Token inválido ou expirado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "401": {
+                  "description": "Token inválido ou expirado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "404":{
-                  "description":"Nenhum usuário encontrado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "403": {
+                  "description": "Acesso negado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
+                        }
+                     }
+                  }
+               },
+               "404": {
+                  "description": "Usuário não encontrado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                }
             },
-            "security":[
+            "security": [
                {
-                  "BearerAuth":[
-                     
-                  ]
+                  "BearerAuth": []
                }
             ]
          },
-         "post":{
-            "tags":[
+         "patch": {
+            "tags": [
                "usuarios"
             ],
-            "summary":"Cadastrar usuário",
-            "description":"Cria um novo usuário no sistema.",
-            "operationId":"cadastrarUsuario",
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/CadastroRequest"
+            "summary": "Atualizar usuário",
+            "description": "Atualiza completamente os dados de um usuário pelo ID.",
+            "operationId": "atualizarUsuario",
+            "parameters": [
+               {
+                  "name": "id",
+                  "in": "path",
+                  "description": "ID do usuário",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
+                  }
+               }
+            ],
+            "requestBody": {
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/AtualizacaoRequest"
                      },
-                     "example":{
-                        "nome":"João",
-                        "email":"j@j.com",
-                        "usuario":"joao",
-                        "senha":"123"
+                     "example": {
+                        "nome": "João",
+                        "email": "j@j.com",
+                        "usuario": "joao"
                      }
                   }
                },
-               "required":true
+               "required": true
             },
-            "responses":{
-               "201":{
-                  "description":"Usuário cadastrado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/CadastroResponse"
+            "responses": {
+               "200": {
+                  "description": "Usuário atualizado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/AtualizacaoResponse"
                         }
                      }
                   }
                },
-               "400":{
-                  "description":"Dados incompletos",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "400": {
+                  "description": "Dados incompletos",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "409":{
-                  "description":"E-mail já cadastrado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "/usuarios/{id}":{
-         "get":{
-            "tags":[
-               "usuarios"
-            ],
-            "summary":"Obter dados de um usuário",
-            "description":"Retorna os detalhes de um usuário específico baseado no ID fornecido.",
-            "operationId":"obterUsuarioPorId",
-            "parameters":[
-               {
-                  "name":"id",
-                  "in":"path",
-                  "description":"ID do usuário a ser recuperado",
-                  "required":true,
-                  "schema":{
-                     "type":"string"
-                  }
-               }
-            ],
-            "responses":{
-               "200":{
-                  "description":"Usuário encontrado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/UsuarioUnicoResponse"
+               "401": {
+                  "description": "Token inválido ou expirado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "401":{
-                  "description":"Token inválido ou expirado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Usuário não encontrado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "404": {
+                  "description": "Usuário já existe",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                }
             },
-            "security":[
+            "security": [
                {
-                  "BearerAuth":[
-                     
-                  ]
+                  "BearerAuth": []
                }
             ]
          },
-         "put":{
-            "tags":[
+         "delete": {
+            "tags": [
                "usuarios"
             ],
-            "summary":"Atualizar usuário",
-            "description":"Atualiza completamente os dados de um usuário pelo ID.",
-            "operationId":"atualizarUsuario",
-            "parameters":[
+            "summary": "Deletar usuário",
+            "description": "Remove um usuário do sistema pelo ID.",
+            "operationId": "deletarUsuario",
+            "parameters": [
                {
-                  "name":"id",
-                  "in":"path",
-                  "description":"ID do usuário",
-                  "required":true,
-                  "schema":{
-                     "type":"string"
+                  "name": "id",
+                  "in": "path",
+                  "description": "ID do usuário",
+                  "required": true,
+                  "schema": {
+                     "type": "string"
                   }
                }
             ],
-            "requestBody":{
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/AtualizacaoRequest"
-                     },
-                     "example":{
-                        "nome":"João",
-                        "email":"j@j.com",
-                        "usuario":"joao"
-                     }
-                  }
-               },
-               "required":true
-            },
-            "responses":{
-               "200":{
-                  "description":"Usuário atualizado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/AtualizacaoResponse"
+            "responses": {
+               "200": {
+                  "description": "Usuário deletado com sucesso",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/SucessoSimples"
                         }
                      }
                   }
                },
-               "400":{
-                  "description":"Dados incompletos",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "401": {
+                  "description": "Token inválido ou expirado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                },
-               "401":{
-                  "description":"Token inválido ou expirado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Usuário não existe",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
+               "403": {
+                  "description": "Acesso negado",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/ErroResponse"
                         }
                      }
                   }
                }
             },
-            "security":[
+            "security": [
                {
-                  "BearerAuth":[
-                     
-                  ]
-               }
-            ]
-         },
-         "delete":{
-            "tags":[
-               "usuarios"
-            ],
-            "summary":"Deletar usuário",
-            "description":"Remove um usuário do sistema pelo ID.",
-            "operationId":"deletarUsuario",
-            "parameters":[
-               {
-                  "name":"id",
-                  "in":"path",
-                  "description":"ID do usuário",
-                  "required":true,
-                  "schema":{
-                     "type":"string"
-                  }
-               }
-            ],
-            "responses":{
-               "200":{
-                  "description":"Usuário deletado com sucesso",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/SucessoSimples"
-                        }
-                     }
-                  }
-               },
-               "401":{
-                  "description":"Token inválido ou expirado",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               },
-               "404":{
-                  "description":"Usuário não existe",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/ErroResponse"
-                        }
-                     }
-                  }
-               }
-            },
-            "security":[
-               {
-                  "BearerAuth":[
-                     
-                  ]
+                  "BearerAuth": []
                }
             ]
          }
       }
    },
-   "components":{
-      "schemas":{
-         "PadraoResposta":{
-            "type":"object",
-            "properties":{
-               "status":{
-                  "type":"string",
-                  "enum":[
+   "components": {
+      "schemas": {
+         "LogoutRequest": {
+            "type": "object",
+            "properties": {
+               "Token": {
+                  "type": "string",
+                  "example": "eyJhbGci..."
+               }
+            }
+         },
+         "PadraoResposta": {
+            "type": "object",
+            "properties": {
+               "status": {
+                  "type": "string",
+                  "enum": [
                      "sucesso",
                      "erro"
                   ]
                },
-               "codigo":{
-                  "type":"string",
-                  "example":"CODIGO_PADRAO"
+               "codigo": {
+                  "type": "string",
+                  "example": "CODIGO_PADRAO"
                },
-               "mensagem":{
-                  "type":"string",
-                  "example":"Mensagem de retorno"
-               },
-               "dados":{
-                  "type":"object"
+               "mensagem": {
+                  "type": "string",
+                  "example": "Mensagem de retorno"
                }
             }
          },
-         "ErroResponse":{
-            "example":{
-               "status":"erro",
-               "codigo":"CODIGO_ERRO",
-               "mensagem":"Descrição do erro",
-               "dados":{
-                  
-               }
+         "ErroResponse": {
+            "example": {
+               "status": "erro",
+               "codigo": "CODIGO_ERRO",
+               "mensagem": "Descrição do erro"
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                }
             ]
          },
-         "SucessoSimples":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"OPERACAO_SUCESSO",
-               "mensagem":"Operação realizada com sucesso",
-               "dados":{
-                  
-               }
+         "SucessoSimples": {
+            "example": {
+               "status": "sucesso",
+               "codigo": "OPERACAO_SUCESSO",
+               "mensagem": "Operação realizada com sucesso",
+               "dados": {}
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                }
             ]
          },
-         "LoginRequest":{
-            "required":[
+         "LoginRequest": {
+            "required": [
                "senha",
                "usuario"
             ],
-            "type":"object",
-            "properties":{
-               "usuario":{
-                  "type":"string",
-                  "example":"joao"
+            "type": "object",
+            "properties": {
+               "usuario": {
+                  "type": "string",
+                  "example": "joao"
                },
-               "senha":{
-                  "type":"string",
-                  "format":"password",
-                  "example":"123"
+               "senha": {
+                  "type": "string",
+                  "format": "password",
+                  "example": "123"
                }
             }
          },
-         "LoginResponse":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"LOGIN_SUCESSO",
-               "mensagem":"Login realizado com sucesso",
-               "dados":{
-                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                  "refreshToken":"eyJhbGci...",
-                  "usuario":{
-                     "id":"1",
-                     "nome":"João",
-                     "email":"j@j.com"
+         "LoginResponse": {
+            "example": {
+               "status": "sucesso",
+               "codigo": "LOGIN_SUCESSO",
+               "mensagem": "Login realizado com sucesso",
+               "dados": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "usuario": {
+                     "id": "1",
+                     "nome": "João",
+                     "email": "j@j.com"
                   }
                }
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                }
             ]
          },
-         "RefreshTokenRequest":{
-            "required":[
-               "refreshToken"
-            ],
-            "type":"object",
-            "properties":{
-               "refreshToken":{
-                  "type":"string",
-                  "example":"eyJhbGci..."
-               }
-            }
-         },
-         "RefreshTokenResponse":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"TOKEN_RENOVADO",
-               "mensagem":"Token renovado com sucesso",
-               "dados":{
-                  "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-               }
-            },
-            "allOf":[
-               {
-                  "$ref":"#/components/schemas/PadraoResposta"
-               }
-            ]
-         },
-         "CadastroRequest":{
-            "required":[
+         "CadastroRequest": {
+            "required": [
                "email",
-               "nome_completo",
+               "nome",
                "senha",
                "usuario"
             ],
-            "type":"object",
-            "properties":{
-               "nome_completo":{
-                  "type":"string",
-                  "example":"João da Silva"
+            "type": "object",
+            "properties": {
+               "nome": {
+                  "type": "string",
+                  "example": "João da Silva"
                },
-               "email":{
-                  "type":"string",
-                  "format":"email",
-                  "example":"j@j.com"
+               "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "j@j.com"
                },
-               "usuario":{
-                  "type":"string",
-                  "example":"joao"
+               "usuario": {
+                  "type": "string",
+                  "example": "joao"
                },
-               "senha":{
-                  "type":"string",
-                  "format":"password",
-                  "example":"123"
+               "senha": {
+                  "type": "string",
+                  "format": "password",
+                  "example": "123"
                },
-               "biografia":{
-                  "type":"string",
-                  "maxLength":150,
-                  "example":"Minha bio aqui"
+               "biografia": {
+                  "type": "string",
+                  "maxLength": 150,
+                  "example": "Minha bio aqui"
                },
-               "foto":{
-                  "type":"string",
-                  "description":"Pode ser uma URL ou string Base64"
+               "foto": {
+                  "type": "string",
+                  "description": "Pode ser uma URL ou string Base64"
                }
             }
          },
-         "CadastroResponse":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"USUARIO_CRIADO",
-               "mensagem":"Usuário cadastrado com sucesso",
-               "dados":{
-                  "id":"1",
-                  "nome":"João",
-                  "email":"j@j.com",
-                  "usuario":"joao"
-               }
+         "CadastroResponse": {
+            "example": {
+               "status": "sucesso",
+               "codigo": "USUARIO_CRIADO",
+               "mensagem": "Usuário cadastrado com sucesso"
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                },
                {
-                  "type":"object",
-                  "properties":{
-                     "dados":{
-                        "$ref":"#/components/schemas/UsuarioSchema"
+                  "type": "object",
+                  "properties": {
+                     "dados": {
+                        "$ref": "#/components/schemas/UsuarioSchema"
                      }
                   }
                }
             ]
          },
-         "AtualizacaoRequest":{
-            "required":[
+         "AtualizacaoRequest": {
+            "required": [
                "email",
-               "nome_completo",
+               "nome",
                "usuario"
             ],
-            "type":"object",
-            "properties":{
-               "nome_completo":{
-                  "type":"string",
-                  "example":"João da Silva"
+            "type": "object",
+            "properties": {
+               "nome": {
+                  "type": "string",
+                  "example": "João da Silva"
                },
-               "email":{
-                  "type":"string",
-                  "format":"email",
-                  "example":"j@j.com"
+               "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "j@j.com"
                },
-               "usuario":{
-                  "type":"string",
-                  "example":"joao"
+               "usuario": {
+                  "type": "string",
+                  "example": "joao"
                },
-               "biografia":{
-                  "type":"string",
-                  "maxLength":150
+               "biografia": {
+                  "type": "string",
+                  "maxLength": 150
                },
-               "foto":{
-                  "type":"string"
+               "foto": {
+                  "type": "string"
                },
-               "senha":{
-                  "type":"string",
-                  "format":"password",
-                  "description":"Nova senha do usuário. Envie apenas se desejar alterá-la."
+               "senha": {
+                  "type": "string",
+                  "format": "password",
+                  "description": "Nova senha do usuário. Envie apenas se desejar alterá-la."
                }
             }
          },
-         "AtualizacaoResponse":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"USUARIO_ATUALIZADO",
-               "mensagem":"Usuário atualizado com sucesso",
-               "dados":{
-                  "id":"1",
-                  "nome":"João",
-                  "email":"j@j.com",
-                  "usuario":"joao"
+         "AtualizacaoResponse": {
+            "example": {
+               "status": "sucesso",
+               "codigo": "USUARIO_ATUALIZADO",
+               "mensagem": "Usuário atualizado com sucesso",
+               "dados": {
+                  "id": "1",
+                  "nome": "João",
+                  "email": "j@j.com",
+                  "usuario": "joao"
                }
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                }
             ]
          },
-         "ListagemResponse":{
-            "example":{
-               "status":"sucesso",
-               "codigo":"LISTAGEM_SUCESSO",
-               "mensagem":"Usuários listados com sucesso",
-               "dados":{
-                  "total":10,
-                  "pagina":1,
-                  "limite":10,
-                  "usuarios":[
+         "ListagemResponse": {
+            "example": {
+               "status": "sucesso",
+               "codigo": "LISTAGEM_SUCESSO",
+               "mensagem": "Usuários listados com sucesso",
+               "dados": {
+                  "total": 10,
+                  "pagina": 1,
+                  "limite": 10,
+                  "usuarios": [
                      {
-                        "id":"1",
-                        "nome":"João",
-                        "email":"j@j.com",
-                        "usuario":"joao"
+                        "id": "1",
+                        "nome": "João",
+                        "email": "j@j.com",
+                        "usuario": "joao"
                      }
                   ]
                }
             },
-            "allOf":[
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                }
             ]
          },
-         "UsuarioSchema":{
-            "type":"object",
-            "properties":{
-               "id":{
-                  "type":"string",
-                  "example":"1"
+         "UsuarioSchema": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "string",
+                  "example": "1"
                },
-               "nome_completo":{
-                  "type":"string",
-                  "example":"João da Silva"
+               "nome_completo": {
+                  "type": "string",
+                  "example": "João da Silva"
                },
-               "usuario":{
-                  "type":"string",
-                  "example":"joao"
+               "usuario": {
+                  "type": "string",
+                  "example": "joao"
                },
-               "email":{
-                  "type":"string",
-                  "format":"email",
-                  "example":"j@j.com"
+               "email": {
+                  "type": "string",
+                  "format": "email",
+                  "example": "j@j.com"
                },
-               "biografia":{
-                  "type":"string",
-                  "maxLength":150,
-                  "example":"Desenvolvedor Java e entusiasta de astronomia."
+               "biografia": {
+                  "type": "string",
+                  "maxLength": 150,
+                  "example": "Desenvolvedor Java e entusiasta de astronomia."
                },
-               "foto_url":{
-                  "type":"string",
-                  "format":"uri",
-                  "example":"https://api.projeto.com/fotos/joao.jpg"
+               "foto_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "https://api.projeto.com/fotos/joao.jpg"
                }
             }
          },
-         "UsuarioUnicoResponse":{
-            "allOf":[
+         "UsuarioUnicoResponse": {
+            "allOf": [
                {
-                  "$ref":"#/components/schemas/PadraoResposta"
+                  "$ref": "#/components/schemas/PadraoResposta"
                },
                {
-                  "type":"object",
-                  "properties":{
-                     "dados":{
-                        "$ref":"#/components/schemas/UsuarioSchema"
+                  "type": "object",
+                  "properties": {
+                     "dados": {
+                        "$ref": "#/components/schemas/UsuarioSchema"
                      }
                   }
                }
             ],
-            "example":{
-               "status":"sucesso",
-               "codigo":"USUARIO_ENCONTRADO",
-               "mensagem":"Dados do usuário recuperados",
-               "dados":{
-                  "id":"1",
-                  "nome":"João",
-                  "email":"j@j.com",
-                  "usuario":"joao"
+            "example": {
+               "status": "sucesso",
+               "codigo": "USUARIO_ENCONTRADO",
+               "mensagem": "Dados do usuário recuperados",
+               "dados": {
+                  "id": "1",
+                  "nome": "João",
+                  "email": "j@j.com",
+                  "usuario": "joao",
+                  "biografia": "Desenvolvedor Java e entusiasta de astronomia."
                }
             }
          }
       },
-      "securitySchemes":{
-         "BearerAuth":{
-            "type":"http",
-            "scheme":"bearer",
-            "bearerFormat":"JWT"
+      "securitySchemes": {
+         "JWT": {
+            "type": "http",
+            "scheme": "JWT Bearer",
+            "bearerFormat": "JWT"
          }
       }
    }
