@@ -12,6 +12,7 @@ A tabela `usuarios` deve ser criada via migração e possuir os respectivos camp
 - `biografia`: String / Máx 150 caracteres (Opcional)
 - `foto_url`: String (Opcional)
 - `senha`: String / Armazenar formato Hash (Obrigatório)
+- `is_admin`: Boolean / Indica se o usuário é administrador (Padrão `false`)
 - `ativo`: Boolean / Padrão `true`
 
 ## 3. Interfaces HTTP (Endpoints REST)
