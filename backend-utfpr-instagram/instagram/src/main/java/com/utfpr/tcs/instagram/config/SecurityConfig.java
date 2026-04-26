@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
                     // Liberação do Swagger Universal e de Arquivos JSON estáticos
-                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/allvesleooorganizati-instagram-api-gerenciamento-de-usuarios-1.0.1-resolved.json").permitAll();
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api-specs.json").permitAll();
                     
                     // Liberação Base ditada na Spec
                     req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
