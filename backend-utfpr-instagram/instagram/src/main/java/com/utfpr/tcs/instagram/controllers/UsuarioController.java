@@ -34,8 +34,9 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
         Usuario usuarioSalvo = service.cadastrar(dto);
+        // Código alternativo interno utilizado anteriormente: .codigo("CADASTRO_CONCLUIDO")
         SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
-            .codigo("CADASTRO_CONCLUIDO")
+            .codigo("USUARIO_CRIADO")
             .mensagem("Usuário criado com sucesso.")
             .dados(new UsuarioDTO(usuarioSalvo))
             .build();
@@ -72,8 +73,9 @@ public class UsuarioController {
             .limite(Math.max(listaUsuariosDto.size(), 1))
             .usuarios(listaUsuariosDto)
             .build();
+        // Código alternativo interno utilizado anteriormente: .codigo("LISTAGEM_CONCLUIDA")
         SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>> sucesso = SucessoPadraoDTO.<ListagemPadraoDTO<UsuarioDTO>>builder()
-            .codigo("LISTAGEM_CONCLUIDA")
+            .codigo("LISTAGEM_SUCESSO")
             .mensagem("Listagem de usuários recuperada.")
             .dados(listagem)
             .build();

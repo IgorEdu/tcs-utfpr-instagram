@@ -8,7 +8,7 @@ import lombok.Data;
 public class UsuarioDTO {
     private Long id;
     
-    @JsonProperty("nome_completo")
+    @JsonProperty("nome")
     private String nomeCompleto;
     
     private String usuario;

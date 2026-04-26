@@ -11,7 +11,7 @@ public abstract class UsuarioBaseDTO {
 
     @Size(min = 3, max = 60, message = "O nome deve ter entre 3 e 60 caracteres")
     @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\s]*$", message = "Nome não deve conter números ou caracteres especiais")
-    @JsonProperty("nome_completo")
+    @JsonProperty("nome")
     private String nomeCompleto;
 
     @Size(min = 3, max = 30, message = "O usuário deve ter entre 3 e 30 caracteres")
