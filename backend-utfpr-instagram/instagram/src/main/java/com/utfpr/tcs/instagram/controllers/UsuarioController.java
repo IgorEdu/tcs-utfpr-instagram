@@ -59,9 +59,23 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<SucessoPadraoDTO<Void>> deletar(@PathVariable Long id) {
+    public ResponseEntity<SucessoPadraoDTO<Void>> deletar(@PathVariable Long id, jakarta.servlet.http.HttpServletRequest request) {
         validarPermissao(id);
         service.deletar(id);
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Usuario) {
+            Usuario logado = (Usuario) auth.getPrincipal();
+            if (logado.getId().equals(id)) {
+                String authHeader = request.getHeader("Authorization");
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    String token = authHeader.replace("Bearer ", "");
+                    java.time.Instant expiracao = tokenService.getExpirationDate(token);
+                    tokenBlacklistService.adicionar(token, expiracao);
+                }
+            }
+        }
+
         SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
             .codigo("USUARIO_DESATIVADO")
             .mensagem("Conta de usuário desativada com sucesso.")
