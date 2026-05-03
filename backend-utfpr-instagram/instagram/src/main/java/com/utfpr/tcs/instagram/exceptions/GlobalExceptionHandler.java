@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.utfpr.tcs.instagram.exceptions.AcessoNegadoException;
 
 import java.util.stream.Collectors;
 
@@ -30,6 +31,15 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
+
+    @ExceptionHandler(AcessoNegadoException.class)
+    public ResponseEntity<ErroPadraoDTO> handleAcessoNegado(AcessoNegadoException ex) {
+        ErroPadraoDTO erro = ErroPadraoDTO.builder()
+                .codigo("ACESSO_NEGADO")
+                .mensagem(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
     }
 
     @ExceptionHandler(RuntimeException.class)

@@ -20,10 +20,6 @@ public class UsuarioCadastroDTO extends UsuarioBaseDTO {
     @Override
     public String getEmail() { return super.getEmail(); }
 
-    @NotBlank(message = "A biografia é obrigatória no cadastro")
-    @Override
-    public String getBiografia() { return super.getBiografia(); }
-
     @NotBlank(message = "A senha é obrigatória")
     @Override
     public String getSenha() { return super.getSenha(); }

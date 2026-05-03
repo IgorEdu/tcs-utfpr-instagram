@@ -22,7 +22,8 @@ RF06 - O perfil de cada usuário deve exibir o número de seguidores e de usuár
 RF07 - O feed deve exibir somente postagens dos usuários que o usuário autenticado segue.
 RF08 - O usuário deve poder visualizar a lista de seus seguidores e de quem ele segue.
 Perfil 
-RF09 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Biografia: máximo 150 caracteres. 
+/*RF09 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Biografia: máximo 150 caracteres. */
+RF09 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Apenas o próprio usuário autenticado ou um administrador do sistema pode editar os dados do perfil ou desativar a conta. Biografia: máximo 150 caracteres.
 RF10 - O usuário deve poder visualizar o perfil público de outros usuários. 
 
 

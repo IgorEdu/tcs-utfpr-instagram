@@ -14,6 +14,9 @@ import com.utfpr.tcs.instagram.dtos.SucessoPadraoDTO;
 import com.utfpr.tcs.instagram.dtos.ListagemPadraoDTO;
 import com.utfpr.tcs.instagram.services.CriptografiaService;
 import com.utfpr.tcs.instagram.services.TokenService;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import com.utfpr.tcs.instagram.exceptions.AcessoNegadoException;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -45,6 +48,7 @@ public class UsuarioController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> atualizar(@PathVariable Long id, @jakarta.validation.Valid @RequestBody com.utfpr.tcs.instagram.dtos.UsuarioAtualizacaoDTO dto) {
+        validarPermissao(id);
         Usuario usuarioAtualizado = service.atualizar(id, dto);
         SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
             .codigo("ATUALIZACAO_CONCLUIDA")
@@ -56,6 +60,7 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<SucessoPadraoDTO<Void>> deletar(@PathVariable Long id) {
+        validarPermissao(id);
         service.deletar(id);
         SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
             .codigo("USUARIO_DESATIVADO")
@@ -127,5 +132,15 @@ public class UsuarioController {
             .dados(new UsuarioDTO(usuario))
             .build();
         return ResponseEntity.ok(sucesso);
+    }
+
+    private void validarPermissao(Long idAlvo) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Usuario) {
+            Usuario logado = (Usuario) auth.getPrincipal();
+            if (!logado.getId().equals(idAlvo) && !Boolean.TRUE.equals(logado.getIsAdmin())) {
+                throw new AcessoNegadoException("Você não tem permissão para realizar esta operação na conta deste usuário.");
+            }
+        }
     }
 }
