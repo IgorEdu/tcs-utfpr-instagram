@@ -1,12 +1,28 @@
-/* Reset Moderno e Variáveis Globais */
+/* Reset e Design System (Dark Mode Premium) */
 :root {
-  --color-background: #ffffff;
-  --color-text: #1a1a1a;
-  --color-primary: #1890ff;
-  --color-primary-hover: #40a9ff;
-  --color-border: #f0f0f0;
+  /* Fundo de Camadas */
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-tertiary: #2A2A2A;
+
+  /* Cores de Texto */
+  --text-primary: #F5F5F5;
+  --text-secondary: #A0A0A0;
   
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  /* Temática do Aplicativo (Pode ser mudada depois) */
+  --color-brand: #E1306C; /* Instagram Pink/Magenta Style */
+  --color-brand-hover: #C12056;
+
+  /* Componentes (Formulários) */
+  --border-color: #333333;
+  --border-radius-base: 8px;
+  
+  /* Sistema de Feedback */
+  --color-error: #FF4D4F;
+  --color-error-bg: rgba(255, 77, 79, 0.1);
+  --color-success: #52C41A;
+  
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -19,8 +35,8 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--text-primary);
+  background: var(--bg-primary);
   font-family: var(--font-family);
   line-height: 1.6;
   text-rendering: optimizeLegibility;
@@ -30,10 +46,16 @@ body {
 
 a {
   text-decoration: none;
-  color: var(--color-primary);
+  color: var(--color-brand);
   transition: color 0.3s ease;
 }
 
 a:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-brand-hover);
+}
+
+/* Base Form Reset para manter consistência das fontes */
+input, textarea, button {
+  font-family: inherit;
+  font-size: 1rem;
 }

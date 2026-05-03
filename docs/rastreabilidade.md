@@ -6,7 +6,7 @@ Esta tabela consolida o status de implementação dos Requisitos Funcionais desc
 
 | ID | Nome do Requisito / Feature | Rota Associada (API) | Status Backend (Java) | Status Frontend (Vue) | Observações |
 |---|---|---|---|---|---|
-| **RF01** | Cadastro de Usuários | `POST /usuarios` | :white_check_mark: Concluído | :x: Pendente | Senha/Hashes incluídas. |
+| **RF01** | Cadastro de Usuários | `POST /usuarios` | :white_check_mark: Concluído | :white_check_mark: Concluído | Senha/Hashes incluídas. |
 | **RF02** | Login / Autenticação JWT | `POST /usuarios/login` | :white_check_mark: Concluído | :x: Pendente | Retorna token Bearer. |
 | **RF03** | Logout | `POST /usuarios/logout` | :white_check_mark: Concluído | :x: Pendente | Uso de Blacklist Redis. |
 | **RF04** | Dinâmica: Seguir Usuários | *A Definir* | :x: Pendente | :x: Pendente | |
