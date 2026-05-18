@@ -36,6 +36,9 @@ public class SecurityConfig {
                     // Liberação Base ditada na Spec
                     req.requestMatchers(HttpMethod.POST, "/usuarios").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll();
+                    
+                    // Liberação Actuator/Prometheus
+                    req.requestMatchers("/actuator/**").permitAll();
 
                     // Qualquer outra chamada (GET usuários, PUT id, POST logout) exige Token Valido
                     req.anyRequest().authenticated();

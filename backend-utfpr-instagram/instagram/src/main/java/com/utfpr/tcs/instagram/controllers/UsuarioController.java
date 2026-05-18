@@ -34,6 +34,9 @@ public class UsuarioController {
     @Autowired
     private com.utfpr.tcs.instagram.services.TokenBlacklistService tokenBlacklistService;
 
+    @Autowired
+    private com.utfpr.tcs.instagram.services.SessaoService sessaoService;
+
     @PostMapping
     public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> cadastrar(@jakarta.validation.Valid @RequestBody UsuarioCadastroDTO dto) {
         Usuario usuarioSalvo = service.cadastrar(dto);
@@ -72,6 +75,7 @@ public class UsuarioController {
                     String token = authHeader.replace("Bearer ", "");
                     java.time.Instant expiracao = tokenService.getExpirationDate(token);
                     tokenBlacklistService.adicionar(token, expiracao);
+                    sessaoService.removerSessao(token);
                 }
             }
         }
@@ -102,7 +106,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SucessoPadraoDTO<TokenResponseDTO>> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<SucessoPadraoDTO<TokenResponseDTO>> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO, jakarta.servlet.http.HttpServletRequest request) {
         Usuario usuario = service.obterPorUsuario(loginDTO.getUsuario());
 
         boolean senhaCorreta = criptografiaService.verificarSenha(loginDTO.getSenha(), usuario.getSenha());
@@ -111,6 +115,13 @@ public class UsuarioController {
         }
 
         String token = tokenService.gerarToken(usuario);
+        
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getRemoteAddr();
+        }
+        sessaoService.registrarSessao(token, usuario.getUsuario(), ip);
+
         SucessoPadraoDTO<TokenResponseDTO> sucesso = SucessoPadraoDTO.<TokenResponseDTO>builder()
             .codigo("LOGIN_CONCLUIDO")
             .mensagem("Autenticação realizada com sucesso.")
@@ -129,6 +140,7 @@ public class UsuarioController {
         String token = authHeader.replace("Bearer ", "");
         java.time.Instant expiracao = tokenService.getExpirationDate(token);
         tokenBlacklistService.adicionar(token, expiracao);
+        sessaoService.removerSessao(token);
 
         SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
             .codigo("SESSAO_ENCERRADA")
@@ -146,6 +158,11 @@ public class UsuarioController {
             .dados(new UsuarioDTO(usuario))
             .build();
         return ResponseEntity.ok(sucesso);
+    }
+
+    @GetMapping("/sessoes")
+    public ResponseEntity<java.util.Collection<com.utfpr.tcs.instagram.services.SessaoService.SessaoAtiva>> listarSessoes() {
+        return ResponseEntity.ok(sessaoService.getSessoesAtivas());
     }
 
     private void validarPermissao(Long idAlvo) {

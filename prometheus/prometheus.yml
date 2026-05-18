@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'instagram-backend'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      # host.docker.internal garante que o Prometheus no container
+      # consiga acessar a aplicação Spring Boot rodando na máquina local
+      - targets: ['host.docker.internal:8080']
