@@ -36,6 +36,14 @@ export const usuarioService = {
   },
 
   /**
+   * Obtém todos os usuários (Admin)
+   */
+  async listar() {
+    const response = await api.get('/usuarios')
+    return response
+  },
+
+  /**
    * Faz o logout no servidor invalidando o token
    */
   async logout() {

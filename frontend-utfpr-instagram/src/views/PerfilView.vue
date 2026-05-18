@@ -1,14 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { usuarioService } from '@/services/usuarioService'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const perfilData = ref(null)
 const isLoading = ref(true)
 const errorMessage = ref(null)
+const currentProfileId = ref(null)
 
 const editingField = ref(null)
 const editForm = ref({
@@ -20,9 +22,11 @@ const editForm = ref({
 const isSaving = ref(false)
 
 onMounted(async () => {
-  if (!authStore.user || !authStore.user.id) {
+  currentProfileId.value = route.params.id || authStore.user?.id
+
+  if (!currentProfileId.value) {
     isLoading.value = false
-    errorMessage.value = 'Usuário não autenticado'
+    errorMessage.value = 'Usuário não especificado ou não autenticado'
     return
   }
 
@@ -33,7 +37,7 @@ const loadProfile = async () => {
   isLoading.value = true
   errorMessage.value = null
   try {
-    const resp = await usuarioService.obterPorId(authStore.user.id)
+    const resp = await usuarioService.obterPorId(currentProfileId.value)
     if (resp.ok) {
       const data = await resp.json()
       perfilData.value = data.dados
@@ -69,13 +73,13 @@ const saveEdit = async (field) => {
 
   try {
     const payload = { [field]: editForm.value[field] }
-    const resp = await usuarioService.atualizar(authStore.user.id, payload)
+    const resp = await usuarioService.atualizar(currentProfileId.value, payload)
     
     if (resp.ok) {
       perfilData.value[field] = editForm.value[field]
       
-      // Atualiza a store global se for um dado de exibição primária
-      if (field === 'nome' || field === 'usuario') {
+      // Atualiza a store global se for um dado de exibição primária do próprio usuário
+      if (currentProfileId.value == authStore.user?.id && (field === 'nome' || field === 'usuario')) {
         authStore.user[field] = editForm.value[field]
         sessionStorage.setItem('instagram_user', JSON.stringify(authStore.user))
       }
@@ -144,7 +148,7 @@ const savePassword = async () => {
   
   try {
     const payload = { senha: passwordForm.value.senha }
-    const resp = await usuarioService.atualizar(authStore.user.id, payload)
+    const resp = await usuarioService.atualizar(currentProfileId.value, payload)
     
     if (resp.ok) {
       passwordSuccess.value = true
