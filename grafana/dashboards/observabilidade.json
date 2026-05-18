@@ -91,6 +91,21 @@
         "wrapLogMessage": true,
         "sortOrder": "Descending"
       }
+    },
+    {
+      "type": "table",
+      "title": "Tokens na Blacklist",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 26 },
+      "targets": [
+        {
+          "datasource": {
+            "type": "redis-datasource",
+            "uid": "redis_ds"
+          },
+          "query": "KEYS token_blacklist:*",
+          "command": "cli"
+        }
+      ]
     }
   ],
   "templating": {

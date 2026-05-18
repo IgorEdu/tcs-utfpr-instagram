@@ -16,3 +16,10 @@ datasources:
     uid: instagram_loki
     isDefault: false
     editable: true
+
+  - name: Redis
+    type: redis-datasource
+    access: proxy
+    url: redis://redis:6379
+    uid: redis_ds
+    editable: true
