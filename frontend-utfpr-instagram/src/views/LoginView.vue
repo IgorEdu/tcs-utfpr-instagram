@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usuarioService } from '@/services/usuarioService'
+import { useAuthStore } from '@/stores/authStore'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const form = ref({
   usuario: '',
@@ -22,14 +24,13 @@ const handleLogin = async () => {
     
     if (resp.ok) {
       const data = await resp.json()
-      // Guardar o token localStorage
+      // Guardar o token e os dados do usuário usando a store Pinia
       if (data && data.dados && data.dados.token) {
-        localStorage.setItem('instagram_token', data.dados.token)
+        authStore.setAuth(data.dados.token, data.dados.usuario)
       }
       
-      // Simulação do redirecionamento após autenticar (ex: /feed ou /dashboard)
-      // Como não criamos uma rota protegida ainda, daremos um mock de sucesso alert.
-      alert(`Login bem sucedido, Bem vindo ${data.dados.usuario.nomeCompleto}!`)
+      // Redireciona para a tela inicial
+      router.push('/home')
     } else {
       const errorData = await resp.json().catch(() => null)
       if (errorData && errorData.mensagem) {

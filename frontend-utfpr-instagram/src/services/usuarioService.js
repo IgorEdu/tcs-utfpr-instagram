@@ -17,5 +17,29 @@ export const usuarioService = {
   async login(credenciais) {
     const response = await api.post('/usuarios/login', credenciais)
     return response
+  },
+
+  /**
+   * Obtém os dados de um usuário pelo seu ID
+   */
+  async obterPorId(id) {
+    const response = await api.get(`/usuarios/${id}`)
+    return response
+  },
+
+  /**
+   * Atualiza os dados do usuário via PATCH
+   */
+  async atualizar(id, dados) {
+    const response = await api.patch(`/usuarios/${id}`, dados)
+    return response
+  },
+
+  /**
+   * Faz o logout no servidor invalidando o token
+   */
+  async logout() {
+    const response = await api.post('/usuarios/logout')
+    return response
   }
 }
