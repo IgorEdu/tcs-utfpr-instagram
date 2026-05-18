@@ -2,6 +2,8 @@ package com.utfpr.tcs.instagram.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
@@ -35,18 +38,21 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
         long startTime = System.currentTimeMillis();
-        filterChain.doFilter(requestWrapper, responseWrapper);
-        long timeTaken = System.currentTimeMillis() - startTime;
+        try {
+            filterChain.doFilter(requestWrapper, responseWrapper);
+        } finally {
+            long timeTaken = System.currentTimeMillis() - startTime;
 
-        String requestBody = getStringValue(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
-        String responseBody = getStringValue(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
+            String requestBody = getStringValue(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
+            String responseBody = getStringValue(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
 
-        logger.info("HTTP {} {} | STATUS: {} | TEMPO: {}ms | PAYLOAD: {} | RESPONSE: {}",
-                request.getMethod(), uri, response.getStatus(), timeTaken, 
-                requestBody.isEmpty() ? "Vazio" : requestBody.replaceAll("[\\r\\n]+", ""), 
-                responseBody.isEmpty() ? "Vazio" : responseBody.replaceAll("[\\r\\n]+", ""));
+            logger.info("HTTP {} {} | STATUS: {} | TEMPO: {}ms | PAYLOAD: {} | RESPONSE: {}",
+                    request.getMethod(), uri, response.getStatus(), timeTaken, 
+                    requestBody.isEmpty() ? "Vazio" : requestBody.replaceAll("[\\r\\n]+", ""), 
+                    responseBody.isEmpty() ? "Vazio" : responseBody.replaceAll("[\\r\\n]+", ""));
 
-        responseWrapper.copyBodyToResponse();
+            responseWrapper.copyBodyToResponse();
+        }
     }
 
     private String getStringValue(byte[] contentAsByteArray, String characterEncoding) {
