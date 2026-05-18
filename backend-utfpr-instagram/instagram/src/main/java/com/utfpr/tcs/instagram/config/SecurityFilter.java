@@ -35,7 +35,8 @@ public class SecurityFilter extends OncePerRequestFilter {
             // Nota de Arquitetura Spec: Bloqueio estrito baseado em cache statful
             if (tokenBlacklistService.isRevogado(tokenJWT)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Sessão finalizada. Este token foi revogado no sistema!");
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"codigo\":\"SESSAO_FINALIZADA\",\"mensagem\":\"Sessão finalizada. Este token foi revogado no sistema!\"}");
                 return;
             }
 

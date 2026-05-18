@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.security.config.Customizer;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Configuration
@@ -43,6 +44,18 @@ public class SecurityConfig {
                     // Qualquer outra chamada (GET usuários, PUT id, POST logout) exige Token Valido
                     req.anyRequest().authenticated();
                 })
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"codigo\":\"CREDENCIAIS_INVALIDAS\",\"mensagem\":\"Acesso negado. Token ausente ou inválido.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"codigo\":\"ACESSO_NEGADO\",\"mensagem\":\"Você não tem permissão para acessar este recurso.\"}");
+                        })
+                )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

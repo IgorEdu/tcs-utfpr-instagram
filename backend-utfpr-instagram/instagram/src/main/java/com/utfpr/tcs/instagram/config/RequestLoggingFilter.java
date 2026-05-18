@@ -6,7 +6,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import jakarta.servlet.FilterChain;
@@ -33,8 +32,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             return;
         }
 
-        // O Spring Boot em algumas versões requer o tamanho do cache. Vamos colocar um buffer de 10KB (suficiente para payloads)
-        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request, 1024 * 10);
+        CachedBodyHttpServletRequest requestWrapper = new CachedBodyHttpServletRequest(request);
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
         long startTime = System.currentTimeMillis();
@@ -43,21 +41,33 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         } finally {
             long timeTaken = System.currentTimeMillis() - startTime;
 
-            String requestBody = getStringValue(requestWrapper.getContentAsByteArray(), request.getCharacterEncoding());
+            String requestBody = getStringValue(requestWrapper.getCachedBody(), request.getCharacterEncoding());
             String responseBody = getStringValue(responseWrapper.getContentAsByteArray(), response.getCharacterEncoding());
 
-            logger.info("HTTP {} {} | STATUS: {} | TEMPO: {}ms | PAYLOAD: {} | RESPONSE: {}",
-                    request.getMethod(), uri, response.getStatus(), timeTaken, 
-                    requestBody.isEmpty() ? "Vazio" : requestBody.replaceAll("[\\r\\n]+", ""), 
-                    responseBody.isEmpty() ? "Vazio" : responseBody.replaceAll("[\\r\\n]+", ""));
+            String formattedRequest = requestBody.isEmpty() ? "Vazio" : requestBody.replaceAll("[\\r\\n]+", "");
+            String formattedResponse = responseBody.isEmpty() ? "Vazio" : responseBody.replaceAll("[\\r\\n]+", "");
+
+            String logMessage = "HTTP {} {} | STATUS: {} | TEMPO: {}ms | PAYLOAD: {} | RESPONSE: {}";
+            int status = response.getStatus();
+
+            if (status >= 500) {
+                logger.error(logMessage, request.getMethod(), uri, status, timeTaken, formattedRequest, formattedResponse);
+            } else if (status >= 400) {
+                logger.warn(logMessage, request.getMethod(), uri, status, timeTaken, formattedRequest, formattedResponse);
+            } else {
+                logger.info(logMessage, request.getMethod(), uri, status, timeTaken, formattedRequest, formattedResponse);
+            }
 
             responseWrapper.copyBodyToResponse();
         }
     }
 
     private String getStringValue(byte[] contentAsByteArray, String characterEncoding) {
+        if (contentAsByteArray == null || contentAsByteArray.length == 0) {
+            return "";
+        }
         try {
-            return new String(contentAsByteArray, 0, contentAsByteArray.length, characterEncoding);
+            return new String(contentAsByteArray, 0, contentAsByteArray.length, characterEncoding != null ? characterEncoding : "UTF-8");
         } catch (Exception e) {
             return new String(contentAsByteArray, StandardCharsets.UTF_8);
         }
