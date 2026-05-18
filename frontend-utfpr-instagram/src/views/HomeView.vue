@@ -26,6 +26,9 @@ const handleLogout = async () => {
       <div class="nav-content">
         <h1 class="logo">Instagram</h1>
         <nav class="actions">
+          <RouterLink to="/configuracoes" class="btn-icon" title="Configurações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 22px; height: 22px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </RouterLink>
           <RouterLink to="/perfil" class="nav-link">Meu Perfil</RouterLink>
           <button @click="handleLogout" class="btn-logout">Sair</button>
         </nav>
@@ -90,6 +93,25 @@ const handleLogout = async () => {
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #a8a8a8);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s, background-color 0.2s;
+  text-decoration: none;
+}
+
+.btn-icon:hover {
+  color: var(--text-primary, #fff);
+  background-color: var(--bg-tertiary, #262626);
 }
 
 .btn-logout {

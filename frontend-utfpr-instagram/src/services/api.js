@@ -1,13 +1,27 @@
 // Configuração central da API usando o Fetch nativo (Sem depender do Axios)
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const getBaseURL = () => {
+  const ip = localStorage.getItem('api_ip')
+  const port = localStorage.getItem('api_port')
+  if (ip && port) {
+    return `http://${ip}:${port}`
+  }
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+}
 
 const getAuthHeaders = () => {
-  const token = sessionStorage.getItem('instagram_token')
-  return token ? { 'Authorization': `Bearer ${token}` } : {}
+  const useFake = sessionStorage.getItem('use_fake_token') === 'true'
+  const fakeToken = sessionStorage.getItem('fake_token')
+  const realToken = sessionStorage.getItem('instagram_token')
+  
+  if (useFake && fakeToken !== null) {
+    return { 'Authorization': `Bearer ${fakeToken}` }
+  }
+  
+  return realToken ? { 'Authorization': `Bearer ${realToken}` } : {}
 }
 
 const fetchWithLogging = async (endpoint, options) => {
-  const url = `${baseURL}${endpoint}`
+  const url = `${getBaseURL()}${endpoint}`
   const startTime = performance.now()
   
   console.log(`[⬆️ REQ] ${options.method} ${url}`, options.body ? JSON.parse(options.body) : '')
