@@ -165,6 +165,40 @@ const savePassword = async () => {
     isSavingPassword.value = false
   }
 }
+
+// Lógica de exclusão de conta
+const isDeletingAccount = ref(false)
+
+const handleDeleteAccount = async () => {
+  if (!window.confirm("Tem certeza que deseja excluir esta conta? Esta ação é irreversível e todos os dados serão apagados permanentemente.")) {
+    return
+  }
+
+  isDeletingAccount.value = true
+  errorMessage.value = null
+
+  try {
+    const resp = await usuarioService.excluir(currentProfileId.value)
+    if (resp.ok) {
+      if (currentProfileId.value == authStore.user?.id) {
+        // Exclusão bem sucedida, limpar auth e ir para login
+        authStore.logout()
+        router.push('/login')
+      } else {
+        // Admin excluindo outra conta
+        alert("Conta excluída com sucesso.")
+        router.push('/admin')
+      }
+    } else {
+      const errData = await resp.json().catch(() => null)
+      errorMessage.value = errData?.mensagem || 'Falha ao excluir a conta.'
+    }
+  } catch (error) {
+    errorMessage.value = 'Erro de comunicação ao tentar excluir a conta.'
+  } finally {
+    isDeletingAccount.value = false
+  }
+}
 </script>
 
 <template>
@@ -282,6 +316,15 @@ const savePassword = async () => {
                   <button @click="togglePasswordForm" class="btn-cancel" :disabled="isSavingPassword">Cancelar</button>
                 </div>
               </div>
+            </div>
+
+            <!-- Zona de Perigo (Descadastrar) -->
+            <div class="field-row danger-zone" v-if="currentProfileId == authStore.user?.id || authStore.user?.is_admin" style="margin-top: 2rem; border-top: 1px solid var(--color-error-bg, rgba(237, 73, 86, 0.3)); padding-top: 1.5rem;">
+              <h3 style="color: var(--color-error, #ed4956); margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 500;">Zona de Perigo</h3>
+              <p class="text-secondary" style="margin-bottom: 1rem; font-size: 0.95rem;">Ao excluir esta conta, todos os dados serão perdidos permanentemente.</p>
+              <button @click="handleDeleteAccount" class="btn-delete-account" :disabled="isDeletingAccount" style="width: max-content;">
+                {{ isDeletingAccount ? 'Excluindo...' : 'Excluir conta' }}
+              </button>
             </div>
           </template>
         </div>
@@ -559,5 +602,28 @@ textarea.edit-input {
   border-radius: var(--border-radius-base, 8px);
   font-size: 0.95rem;
   border: 1px solid #4ade80;
+}
+
+/* Danger Zone */
+.btn-delete-account {
+  background-color: transparent;
+  color: var(--color-error, #ed4956);
+  border: 1px solid var(--color-error, #ed4956);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-base, 4px);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-delete-account:hover:not(:disabled) {
+  background-color: var(--color-error, #ed4956);
+  color: #fff;
+}
+
+.btn-delete-account:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

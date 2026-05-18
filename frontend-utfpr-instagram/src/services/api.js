@@ -61,7 +61,7 @@ const api = {
         'Content-Type': 'application/json',
         ...getAuthHeaders()
       },
-      body: JSON.stringify(data)
+      body: data ? JSON.stringify(data) : undefined
     })
   },
 
@@ -83,6 +83,16 @@ const api = {
         ...getAuthHeaders()
       },
       body: JSON.stringify(data)
+    })
+  },
+
+  async delete(endpoint) {
+    return fetchWithLogging(endpoint, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      }
     })
   }
 }

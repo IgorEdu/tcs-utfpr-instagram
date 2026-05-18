@@ -49,5 +49,13 @@ export const usuarioService = {
   async logout() {
     const response = await api.post('/usuarios/logout')
     return response
+  },
+
+  /**
+   * Exclui um usuário (Descadastrar)
+   */
+  async excluir(id) {
+    const response = await api.delete(`/usuarios/${id}`)
+    return response
   }
 }

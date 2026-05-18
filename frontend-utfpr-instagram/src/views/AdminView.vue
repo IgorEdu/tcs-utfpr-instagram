@@ -6,6 +6,29 @@ import { usuarioService } from '@/services/usuarioService'
 const usuarios = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
+const isDeleting = ref({})
+
+const handleDeleteUser = async (user) => {
+  if (!window.confirm(`Tem certeza que deseja excluir o usuário @${user.usuario}? Esta ação é irreversível.`)) {
+    return
+  }
+
+  isDeleting.value[user.id] = true
+  
+  try {
+    const resp = await usuarioService.excluir(user.id)
+    if (resp.ok) {
+      usuarios.value = usuarios.value.filter(u => u.id !== user.id)
+    } else {
+      const errData = await resp.json().catch(() => null)
+      alert(errData?.mensagem || 'Falha ao excluir o usuário.')
+    }
+  } catch (error) {
+    alert('Erro de comunicação ao tentar excluir o usuário.')
+  } finally {
+    isDeleting.value[user.id] = false
+  }
+}
 
 onMounted(async () => {
   try {
@@ -55,6 +78,9 @@ onMounted(async () => {
           </div>
           <div class="user-actions">
             <RouterLink :to="'/perfil/' + user.id" class="btn-save">Ver Perfil</RouterLink>
+            <button @click="handleDeleteUser(user)" class="btn-delete" :disabled="isDeleting[user.id]">
+              {{ isDeleting[user.id] ? 'Excluindo...' : 'Excluir' }}
+            </button>
           </div>
         </div>
       </div>
@@ -233,5 +259,33 @@ onMounted(async () => {
 
 .btn-save:hover {
   background-color: var(--color-brand-hover, #1877f2);
+}
+
+.user-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-delete {
+  background-color: transparent;
+  color: var(--color-error, #ed4956);
+  border: 1px solid var(--color-error, #ed4956);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background-color: var(--color-error, #ed4956);
+  color: #fff;
+}
+
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
