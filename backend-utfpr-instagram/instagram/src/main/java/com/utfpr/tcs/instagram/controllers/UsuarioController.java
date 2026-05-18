@@ -91,9 +91,6 @@ public class UsuarioController {
     public ResponseEntity<SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>>> listar() {
         var listaUsuariosDto = service.listarTodos().stream().map(UsuarioDTO::new).toList();
         ListagemPadraoDTO<UsuarioDTO> listagem = ListagemPadraoDTO.<UsuarioDTO>builder()
-            .total(listaUsuariosDto.size())
-            .pagina(1)
-            .limite(Math.max(listaUsuariosDto.size(), 1))
             .usuarios(listaUsuariosDto)
             .build();
         // Código alternativo interno utilizado anteriormente: .codigo("LISTAGEM_CONCLUIDA")

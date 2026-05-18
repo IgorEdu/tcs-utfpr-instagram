@@ -12,8 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListagemPadraoDTO<T> {
-    private long total;
-    private int pagina;
-    private int limite;
     private List<T> usuarios; // Deixando "usuarios" para manter o Swagger igual (ou itens universal)
 }
