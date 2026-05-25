@@ -87,6 +87,11 @@ public class UsuarioService {
         return repository.findByAtivoTrue();
     }
 
+    public java.util.List<Usuario> listarInativos() {
+        // Retorna a lista contendo apenas usuários inativos
+        return repository.findByAtivoFalse();
+    }
+
     public Usuario obterPorId(Long id) {
         return repository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));

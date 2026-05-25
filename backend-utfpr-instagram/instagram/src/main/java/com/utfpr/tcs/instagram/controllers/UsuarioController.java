@@ -102,6 +102,29 @@ public class UsuarioController {
         return ResponseEntity.ok(sucesso);
     }
 
+    @GetMapping("/inativos")
+    public ResponseEntity<SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>>> listarInativos() {
+        // Apenas para admin (verificado se necessário na rota ou pela lógica)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Usuario) {
+            Usuario logado = (Usuario) auth.getPrincipal();
+            if (!Boolean.TRUE.equals(logado.getIsAdmin())) {
+                throw new AcessoNegadoException("Apenas administradores podem listar usuários inativos.");
+            }
+        }
+
+        var listaUsuariosDto = service.listarInativos().stream().map(UsuarioDTO::new).toList();
+        ListagemPadraoDTO<UsuarioDTO> listagem = ListagemPadraoDTO.<UsuarioDTO>builder()
+            .usuarios(listaUsuariosDto)
+            .build();
+        SucessoPadraoDTO<ListagemPadraoDTO<UsuarioDTO>> sucesso = SucessoPadraoDTO.<ListagemPadraoDTO<UsuarioDTO>>builder()
+            .codigo("LISTAGEM_SUCESSO")
+            .mensagem("Listagem de usuários inativos recuperada.")
+            .dados(listagem)
+            .build();
+        return ResponseEntity.ok(sucesso);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<SucessoPadraoDTO<TokenResponseDTO>> login(@jakarta.validation.Valid @RequestBody LoginDTO loginDTO, jakarta.servlet.http.HttpServletRequest request) {
         Usuario usuario = service.obterPorUsuario(loginDTO.getUsuario());

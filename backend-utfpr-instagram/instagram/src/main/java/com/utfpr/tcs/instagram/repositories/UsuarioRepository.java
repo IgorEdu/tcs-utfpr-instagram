@@ -14,5 +14,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     java.util.List<Usuario> findByAtivoTrue();
 
+    java.util.List<Usuario> findByAtivoFalse();
+
     Optional<Usuario> findByIdAndAtivoTrue(Long id);
 }

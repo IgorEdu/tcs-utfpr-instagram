@@ -7,6 +7,30 @@ const usuarios = ref([])
 const isLoading = ref(true)
 const errorMessage = ref(null)
 const isDeleting = ref({})
+const showingInativos = ref(false)
+
+const loadUsuarios = async () => {
+  isLoading.value = true
+  errorMessage.value = null
+  try {
+    const resp = showingInativos.value ? await usuarioService.listarInativos() : await usuarioService.listar()
+    if (resp.ok) {
+      const data = await resp.json()
+      usuarios.value = data.dados?.usuarios || []
+    } else {
+      errorMessage.value = 'Falha ao carregar usuários.'
+    }
+  } catch (error) {
+    errorMessage.value = 'Erro de comunicação.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const toggleView = (inativos) => {
+  showingInativos.value = inativos
+  loadUsuarios()
+}
 
 const handleDeleteUser = async (user) => {
   if (!window.confirm(`Tem certeza que deseja excluir o usuário @${user.usuario}? Esta ação é irreversível.`)) {
@@ -30,21 +54,7 @@ const handleDeleteUser = async (user) => {
   }
 }
 
-onMounted(async () => {
-  try {
-    const resp = await usuarioService.listar()
-    if (resp.ok) {
-      const data = await resp.json()
-      usuarios.value = data.dados?.usuarios || []
-    } else {
-      errorMessage.value = 'Falha ao carregar usuários.'
-    }
-  } catch (error) {
-    errorMessage.value = 'Erro de comunicação.'
-  } finally {
-    isLoading.value = false
-  }
-})
+onMounted(loadUsuarios)
 </script>
 
 <template>
@@ -64,8 +74,15 @@ onMounted(async () => {
         <p class="text-secondary">Gerencie os usuários do sistema</p>
       </div>
 
+      <div class="tabs">
+        <button :class="['tab-btn', !showingInativos ? 'active' : '']" @click="toggleView(false)">Ativos</button>
+        <button :class="['tab-btn', showingInativos ? 'active' : '']" @click="toggleView(true)">Inativos</button>
+      </div>
+
       <div v-if="isLoading" class="loader">Carregando usuários...</div>
       <div v-else-if="errorMessage" class="error-msg">{{ errorMessage }}</div>
+      
+      <div v-else-if="usuarios.length === 0" class="empty-msg">Nenhum usuário encontrado na categoria.</div>
       
       <div v-else class="users-list">
         <div v-for="user in usuarios" :key="user.id" class="user-card">
@@ -78,7 +95,8 @@ onMounted(async () => {
           </div>
           <div class="user-actions">
             <RouterLink :to="'/perfil/' + user.id" class="btn-save">Ver Perfil</RouterLink>
-            <button @click="handleDeleteUser(user)" class="btn-delete" :disabled="isDeleting[user.id]">
+            
+            <button v-if="!showingInativos" @click="handleDeleteUser(user)" class="btn-delete" :disabled="isDeleting[user.id]">
               {{ isDeleting[user.id] ? 'Excluindo...' : 'Excluir' }}
             </button>
           </div>
@@ -287,5 +305,45 @@ onMounted(async () => {
 .btn-delete:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #333);
+  padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--text-secondary, #a8a8a8);
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background-color: var(--bg-tertiary, #262626);
+}
+
+.tab-btn.active {
+  color: var(--text-primary, #fff);
+  background-color: var(--bg-tertiary, #262626);
+}
+
+.empty-msg {
+  text-align: center;
+  color: var(--text-secondary, #a8a8a8);
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  padding: 2rem;
+  background-color: var(--bg-secondary, #111);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color, #333);
 }
 </style>

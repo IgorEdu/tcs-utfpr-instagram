@@ -44,6 +44,14 @@ export const usuarioService = {
   },
 
   /**
+   * Obtém todos os usuários inativos (Admin)
+   */
+  async listarInativos() {
+    const response = await api.get('/usuarios/inativos')
+    return response
+  },
+
+  /**
    * Faz o logout no servidor invalidando o token
    */
   async logout() {
