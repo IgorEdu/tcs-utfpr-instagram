@@ -66,7 +66,7 @@ Aplicável em falhas controladas, disparado exclusivamente pelas capturas sistê
 {
    "status": "erro",
    "codigo": "FORMULARIO_VIOLADO",
-   "mensagem": "A biografia informada excede os limites estabelecidos de 120 caracteres."
+   "mensagem": "A biografia informada excede os limites estabelecidos de 150 caracteres."
 }
 ```
 
