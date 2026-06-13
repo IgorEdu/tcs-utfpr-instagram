@@ -54,7 +54,7 @@ public class UsuarioController {
         validarPermissao(id);
         Usuario usuarioAtualizado = service.atualizar(id, dto);
         SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
-            .codigo("ATUALIZACAO_CONCLUIDA")
+            .codigo("USUARIO_ATUALIZADO")
             .mensagem("Dados atualizados com sucesso.")
             .dados(new UsuarioDTO(usuarioAtualizado))
             .build();
@@ -81,7 +81,7 @@ public class UsuarioController {
         }
 
         SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
-            .codigo("USUARIO_DESATIVADO")
+            .codigo("OPERACAO_SUCESSO")
             .mensagem("Conta de usuário desativada com sucesso.")
             .build();
         return ResponseEntity.ok(sucesso);
@@ -143,7 +143,7 @@ public class UsuarioController {
         sessaoService.registrarSessao(token, usuario.getUsuario(), ip);
 
         SucessoPadraoDTO<TokenResponseDTO> sucesso = SucessoPadraoDTO.<TokenResponseDTO>builder()
-            .codigo("LOGIN_CONCLUIDO")
+            .codigo("LOGIN_SUCESSO")
             .mensagem("Autenticação realizada com sucesso.")
             .dados(new TokenResponseDTO(token, new UsuarioDTO(usuario)))
             .build();
@@ -163,7 +163,7 @@ public class UsuarioController {
         sessaoService.removerSessao(token);
 
         SucessoPadraoDTO<Void> sucesso = SucessoPadraoDTO.<Void>builder()
-            .codigo("SESSAO_ENCERRADA")
+            .codigo("OPERACAO_SUCESSO")
             .mensagem("Logout realizado, token invalidado.")
             .build();
         return ResponseEntity.ok(sucesso);
@@ -173,7 +173,7 @@ public class UsuarioController {
     public ResponseEntity<SucessoPadraoDTO<UsuarioDTO>> obterPorId(@PathVariable Long id) {
         Usuario usuario = service.obterPorId(id);
         SucessoPadraoDTO<UsuarioDTO> sucesso = SucessoPadraoDTO.<UsuarioDTO>builder()
-            .codigo("RECURSO_RECUPERADO")
+            .codigo("USUARIO_ENCONTRADO")
             .mensagem("Usuário encontrado.")
             .dados(new UsuarioDTO(usuario))
             .build();

@@ -22,7 +22,7 @@ public abstract class UsuarioBaseDTO {
     @Size(min = 10, max = 35, message = "O email deve ter entre 10 e 35 caracteres")
     private String email;
 
-    @Size(min = 5, max = 120, message = "Biografia deve conter entre 5 e 120 caracteres")
+    @Size(min = 5, max = 150, message = "Biografia deve conter entre 5 e 150 caracteres")
     private String biografia;
 
     @JsonProperty("foto")
