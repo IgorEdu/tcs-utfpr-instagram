@@ -6,7 +6,7 @@ Requisitos Funcionais (RF)
 O que o sistema deve fazer e quais funcionalidades deve oferecer.
 Cadastro de Usuários:
 RF01 - Cadastro: O sistema deve permitir cadastro de novos usuários.
-Campos obrigatórios: Nome, Biografia, (@)Usuário, Senha, Email;
+Campos obrigatórios: Nome,(@)Usuário, Senha, Email;
 O sistema deve permitir que seja desativada a conta, não excluída.
 	Autenticação (Login)
 RF02 - Login: O sistema deve aceitar o login apenas com o preenchimento dos campos usuário e senha.
@@ -15,16 +15,14 @@ O autenticação deve ser Token JWT.
 A autenticação do token será enviado o token no formato bearer token.
 No token será enviado um ‘iat’ com o tempo de expiração do token 
 RF03 - Logout: O sistema deve realizar o logout assim quando desejar.
-	Seguir/Seguidores
-RF04 - O usuário deve poder seguir e deixar de seguir outros usuários.
-RF05 - Um usuário não pode seguir a si mesmo.
-RF06 - O perfil de cada usuário deve exibir o número de seguidores e de usuários que ele segue.
-RF07 - O feed deve exibir somente postagens dos usuários que o usuário autenticado segue.
-RF08 - O usuário deve poder visualizar a lista de seus seguidores e de quem ele segue.
 Perfil 
-/*RF09 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Biografia: máximo 150 caracteres. */
-RF09 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Apenas o próprio usuário autenticado ou um administrador do sistema pode editar os dados do perfil ou desativar a conta. Biografia: máximo 150 caracteres.
-RF10 - O usuário deve poder visualizar o perfil público de outros usuários. 
+RF04 - O usuário deve poder editar seu perfil: nome completo, nome de usuário, foto de perfil e biografia. Biografia: máximo 150 caracteres. 
+RF05 - O usuário deve poder visualizar o perfil público de outros usuários. 
+RF06 - Conta Admin Padrão: Deve existir um usuário pré-criado no banco de dados com o username "admin" e senha "admin123".
+RF07 - Permissões baseadas no Token: O servidor deve definir o nível de acesso verificando o username no token:
+Identificação de usuário admin: O token informado na requisição deve conter o username "admin".
+Token do "admin": Pode listar todos os usuários e tem permissão para editar ou excluir qualquer usuário informando o ID.
+Token comum (não-admin): O usuário só pode editar ou excluir a própria conta (o ID informado na requisição deve pertencer ao username do token).
 
 
 Requisitos Não Funcionais (RNF)
@@ -33,7 +31,7 @@ RNF01 - Comunicação via HTTP: A comunicação entre as aplicações (Cliente e
 RFN02 -  Campos do cadastro:O formulário deverá contar com a obrigatoriedade de todos os campos.
 Campo Nome: O campo nome completo deve ter entre 3 e 60 caracteres.
 Permitidos: Letras e espaços. Não permitido: caracteres especiais e números;
-Campo Biografia: O campo Biografia deve ter entre 5 e 120 caracteres.
+Campo Biografia: O campo Biografia deve ter no máximo 150 caracteres.
 Permitidos: 
 Campo Usuário: O campo usuário deve permitir entre 3 e 30 caracteres.
 Permitir letras minúsculas, underline(_) e números. Não permitir caracteres especiais, espaço, letras maiúsculas;
@@ -43,20 +41,18 @@ Campo Foto: A partir da segunda entrega; decidir como serão armazenadas ou refe
 Permitir apenas números e letras no campo deve ser oculto. Ex.:(****)
 RNF03 - Cadastro de novas fotos (itens obrigatórios): O sistema deverá obrigatoriamente aceitar apenas novos post de imagem com formato apenas em .JPG com a obrigatoriedade de uma foto anexada com o limite de 1(uma) foto de no máximo 5MB e opcionalmente com uma descrição com limite de até 50 caracteres. 
 RNF04 - Formato do token - Bearer token no cabeçalho da requisição
+RNF05 - Padronização de Identificadores no Banco de Dados: O sistema deve utilizar obrigatoriamente o tipo de dado numérico inteiro (INT com auto-incremento) para a chave primária (ID) de todas as tabelas relacionais do banco de dados.
 Postagens
-RNF05 - O sistema obrigatoriamente a postagem de uma (1) foto, sendo obrigatório a legenda entre 5 a 200 caracteres, letras, espaços e não permitir caracteres especiais e acento;
-RNF06 - Os formatos aceitos devem ser JPG, JPEG e PNG.
+RNF06 - O sistema obrigatoriamente a postagem de uma (1) foto, sendo obrigatório a legenda entre 0 a 200 caracteres, letras, espaços e não permitir caracteres especiais e acento;
+RNF07 - Os formatos aceitos devem ser JPG, JPEG e PNG.
 Aceitar apenas no tamanho máximo de 10 Mb.
-RNF07 - O usuário pode editar a postagem apenas da legenda.
-RNF08 - O usuário pode excluir a postagem mas não remover apenas a foto ou legenda.
+RNF08 - O usuário pode editar apenas a legenda da postagem.
+RNF09 - O usuário pode excluir a postagem mas não remover apenas a foto ou legenda.
+RNF10 - O envio de imagens (fotos de perfil e fotos das postagens) entre o Cliente e o Servidor deve ser realizado obrigatoriamente através do encapsulamento em objetos JSON. O cliente deverá converter os dados binários da imagem para uma string codificada em Base64 antes do envio.
+RNF11 - O servidor deve enviar informações de imagens no formato de Base64 para o Cliente.
+
+
 Curtidas
-RNF09 - O usuário pode curtir e descurtir uma postagem apenas 1 vez.
-RNF10 - O sistema deverá exibir a quantidade de curtidas da postagem
-RNF11 --O sistema não deverá permitir que um usuário não autenticado curta uma postagem.
-Comentários
-RNF12 - O usuário autenticado pode comentar em postagens.
-O comentário deve ter entre 1 e 300 caracteres;
-RNF13 - O usuário pode excluir seus próprios comentários.
-RNF14 - O dono da postagem pode excluir qualquer comentário feito em sua publicação.
-
-
+RNF12 - O usuário pode curtir e descurtir uma postagem apenas 1 vez.
+RNF13 - O sistema deverá exibir a quantidade de curtidas da postagem
+RNF14 --O sistema não deverá permitir que um usuário não autenticado curta uma postagem.
