@@ -14,8 +14,8 @@
 | **RF10** | Visualizar perfil público | `[CONCLUÍDO]` | `UsuarioController.obterPorId()` com filtro de Ativo |
 | **RNF01** | Comunicação Rest HTTP | `[CONCLUÍDO]` | Controllers Spring Web MVC |
 | **RNF02** | Validação Universal dos Campos (RegEx e Sizes de Senha, User, Bio, etc) | `[CONCLUÍDO]` | Ajustado perfeitamente via `jakarta.validation.constraints` nos DTOs |
-| **RNF03** | Limite/Formato upload foto (JPG, max 5MB, desc max 50 chars) | `[A FAZER]` | - |
+| **RNF03** | Limite/Formato upload foto (Base64) e Legenda | `[CONCLUÍDO]` | Ajustado na Spec `03-postagens.md` (legenda 5 a 200). Implementado em `CriacaoPostRequestDTO` |
 | **RNF04** | Formato Bearer Token no Request Header | `[CONCLUÍDO]` | `SecurityFilter.recuperarToken()` |
-| **RNF05-RNF08** | Limitações de Postagens (CRUD, formatos) | `[A FAZER]` | - |
-| **RNF09-RNF11** | Validações e Controle de Curtidas | `[A FAZER]` | - |
+| **RNF05-RNF08** | Limitações de Postagens (CRUD, formatos) | `[CONCLUÍDO]` | `Post.java`, `PostService.java`, endpoints em `PostController.java` |
+| **RNF09-RNF11** | Validações e Controle de Curtidas | `[CONCLUÍDO]` | `PostService.curtir()`, tabela `curtidas_post` |
 | **RNF12-RNF14** | Validações e Restrições de Comentários | `[A FAZER]` | - |
