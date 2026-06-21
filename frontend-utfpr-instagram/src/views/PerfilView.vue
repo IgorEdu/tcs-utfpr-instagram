@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { usuarioService } from '@/services/usuarioService'
+import { postService } from '@/services/postService'
+import PostCard from '@/components/PostCard.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -31,6 +33,7 @@ onMounted(async () => {
   }
 
   await loadProfile()
+  await loadPosts()
 })
 
 const loadProfile = async () => {
@@ -199,6 +202,101 @@ const handleDeleteAccount = async () => {
     isDeletingAccount.value = false
   }
 }
+
+// Logica de Postagens
+const posts = ref([])
+const isPostsLoading = ref(false)
+const postsError = ref(null)
+
+const newPost = ref({ imagem: '', legenda: '' })
+const isCreatingPost = ref(false)
+const showCreatePostModal = ref(false)
+
+const loadPosts = async () => {
+  isPostsLoading.value = true
+  postsError.value = null
+  try {
+    const resp = await postService.listar(currentProfileId.value)
+    if (resp.ok) {
+      const data = await resp.json()
+      posts.value = data.dados.posts || []
+    } else {
+      postsError.value = 'Falha ao carregar posts.'
+    }
+  } catch (error) {
+    postsError.value = 'Erro de rede ao carregar posts.'
+  } finally {
+    isPostsLoading.value = false
+  }
+}
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.size > 5 * 1024 * 1024) {
+    alert("A imagem não pode ter mais de 5MB")
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    newPost.value.imagem = event.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+const handleCreatePost = async () => {
+  if (!newPost.value.imagem) {
+    alert("Selecione uma imagem.")
+    return
+  }
+  if (newPost.value.legenda.length < 5 || newPost.value.legenda.length > 200) {
+    alert("A legenda deve ter entre 5 e 200 caracteres.")
+    return
+  }
+
+  isCreatingPost.value = true
+  try {
+    const resp = await postService.criar(currentProfileId.value, newPost.value)
+    if (resp.ok) {
+      showCreatePostModal.value = false
+      newPost.value = { imagem: '', legenda: '' }
+      await loadPosts()
+    } else {
+      const err = await resp.json().catch(() => null)
+      alert(err?.mensagem || "Erro ao criar post.")
+    }
+  } catch (error) {
+    alert("Falha de rede ao criar post.")
+  } finally {
+    isCreatingPost.value = false
+  }
+}
+
+const onCurtir = async (postId) => {
+  try {
+    const resp = await postService.curtir(currentProfileId.value, postId)
+    if (resp.ok) await loadPosts()
+  } catch(e) {}
+}
+
+const onDeletar = async (postId) => {
+  try {
+    const resp = await postService.deletar(currentProfileId.value, postId)
+    if (resp.ok) {
+      posts.value = posts.value.filter(p => p.id !== postId)
+    }
+  } catch(e) {}
+}
+
+const onAtualizar = async (postId, novaLegenda) => {
+  try {
+    const resp = await postService.atualizar(currentProfileId.value, postId, { legenda: novaLegenda })
+    if (resp.ok) {
+      const postIndex = posts.value.findIndex(p => p.id === postId)
+      if (postIndex !== -1) posts.value[postIndex].conteudo = novaLegenda
+    }
+  } catch(e) {}
+}
 </script>
 
 <template>
@@ -327,6 +425,48 @@ const handleDeleteAccount = async () => {
               </button>
             </div>
           </template>
+        </div>
+      </div>
+
+      <!-- Feed Section -->
+      <div class="posts-section">
+        <div class="posts-header">
+          <h3>Publicações</h3>
+          <button v-if="currentProfileId == authStore.user?.id" @click="showCreatePostModal = !showCreatePostModal" class="btn-save">
+            {{ showCreatePostModal ? 'Cancelar Post' : '+ Novo Post' }}
+          </button>
+        </div>
+
+        <div v-if="showCreatePostModal" class="create-post-container">
+          <div class="input-group" style="margin-bottom: 1rem;">
+            <input type="file" accept="image/jpeg, image/png, image/jpg" @change="handleFileChange" style="color: white;"/>
+          </div>
+          <div v-if="newPost.imagem" class="preview-img-container">
+            <img :src="newPost.imagem" alt="Preview" class="preview-img" />
+          </div>
+          <div class="input-group">
+            <textarea v-model="newPost.legenda" class="edit-input" placeholder="Escreva uma legenda (5 a 200 caracteres)..." rows="3"></textarea>
+          </div>
+          <button @click="handleCreatePost" :disabled="isCreatingPost" class="btn-save" style="margin-top: 1rem;">
+            {{ isCreatingPost ? 'Publicando...' : 'Publicar' }}
+          </button>
+        </div>
+
+        <div v-if="isPostsLoading" class="loader" style="margin-top: 2rem;">Carregando publicações...</div>
+        <div v-else-if="postsError" class="error-msg" style="margin-top: 2rem;">{{ postsError }}</div>
+        <div v-else-if="posts.length === 0" class="no-posts">
+          Nenhuma publicação ainda.
+        </div>
+        <div v-else class="posts-grid">
+          <PostCard 
+            v-for="post in posts" 
+            :key="post.id" 
+            :post="post" 
+            :isOwner="currentProfileId == authStore.user?.id || authStore.user?.is_admin"
+            @curtir="onCurtir"
+            @deletar="onDeletar"
+            @atualizar="onAtualizar"
+          />
         </div>
       </div>
     </main>
@@ -625,5 +765,53 @@ textarea.edit-input {
 .btn-delete-account:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Postagens Styles */
+.posts-section {
+  margin-top: 3rem;
+}
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color, #333);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+.posts-header h3 {
+  font-weight: 400;
+  margin: 0;
+  font-size: 1.5rem;
+}
+.create-post-container {
+  background: var(--bg-tertiary, #262626);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-color, #333);
+}
+.preview-img-container {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+.no-posts {
+  text-align: center;
+  color: var(--text-secondary, #a8a8a8);
+  padding: 4rem 0;
+  font-size: 1.1rem;
 }
 </style>
