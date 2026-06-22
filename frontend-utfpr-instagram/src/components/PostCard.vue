@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const props = defineProps({
   post: {
@@ -14,8 +15,14 @@ const props = defineProps({
 
 const emit = defineEmits(['curtir', 'deletar', 'atualizar'])
 
+const authStore = useAuthStore()
+const isLikedByMe = computed(() => {
+  if (!authStore.user || !props.post.curtidasIds) return false
+  return props.post.curtidasIds.includes(authStore.user.id.toString())
+})
+
 const isEditing = ref(false)
-const editConteudo = ref(props.post.conteudo)
+const editLegenda = ref(props.post.legenda)
 
 const handleCurtir = () => {
   emit('curtir', props.post.id)
@@ -29,15 +36,15 @@ const handleDelete = () => {
 
 const toggleEdit = () => {
   isEditing.value = !isEditing.value
-  editConteudo.value = props.post.conteudo
+  editLegenda.value = props.post.legenda
 }
 
 const saveEdit = () => {
-  if (editConteudo.value.length < 5 || editConteudo.value.length > 200) {
+  if (editLegenda.value.length < 5 || editLegenda.value.length > 200) {
     alert('A legenda deve ter entre 5 e 200 caracteres.')
     return
   }
-  emit('atualizar', props.post.id, editConteudo.value)
+  emit('atualizar', props.post.id, editLegenda.value)
   isEditing.value = false
 }
 
@@ -58,8 +65,8 @@ const cancelEdit = () => {
     </div>
 
     <div class="post-actions">
-      <button class="action-btn like-btn" @click="handleCurtir" title="Curtir">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-heart">
+      <button class="action-btn like-btn" @click="handleCurtir" title="Curtir" :class="{ 'liked': isLikedByMe }">
+        <svg viewBox="0 0 24 24" :fill="isLikedByMe ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" class="icon-heart">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
       </button>
@@ -81,12 +88,12 @@ const cancelEdit = () => {
 
     <div class="post-content">
       <div v-if="!isEditing" class="caption-display">
-        <span class="caption-text">{{ post.conteudo }}</span>
+        <span class="caption-text">{{ post.legenda }}</span>
       </div>
       
       <div v-else class="caption-edit">
         <textarea 
-          v-model="editConteudo" 
+          v-model="editLegenda" 
           rows="2" 
           class="edit-textarea"
           placeholder="Escreva uma nova legenda..."
@@ -155,6 +162,10 @@ const cancelEdit = () => {
 }
 
 .like-btn:hover {
+  color: #ed4956;
+}
+
+.like-btn.liked {
   color: #ed4956;
 }
 

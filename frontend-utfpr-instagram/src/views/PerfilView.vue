@@ -219,7 +219,7 @@ const loadPosts = async () => {
     const resp = await postService.listar(currentProfileId.value)
     if (resp.ok) {
       const data = await resp.json()
-      posts.value = data.dados.posts || []
+      posts.value = data.posts || (data.dados && data.dados.posts) || []
     } else {
       postsError.value = 'Falha ao carregar posts.'
     }
@@ -293,7 +293,7 @@ const onAtualizar = async (postId, novaLegenda) => {
     const resp = await postService.atualizar(currentProfileId.value, postId, { legenda: novaLegenda })
     if (resp.ok) {
       const postIndex = posts.value.findIndex(p => p.id === postId)
-      if (postIndex !== -1) posts.value[postIndex].conteudo = novaLegenda
+      if (postIndex !== -1) posts.value[postIndex].legenda = novaLegenda
     }
   } catch(e) {}
 }

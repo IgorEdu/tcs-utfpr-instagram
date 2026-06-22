@@ -34,16 +34,12 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<SucessoPadraoDTO<ListagemPostsResponseDTO>> listar(@PathVariable("id-usuario") Long idUsuario) {
+    public ResponseEntity<ListagemPostsResponseDTO> listar(@PathVariable("id-usuario") Long idUsuario) {
         List<Post> posts = service.listarAtivos(idUsuario);
         List<PostResponseDTO> dtos = posts.stream().map(PostResponseDTO::new).toList();
         
-        SucessoPadraoDTO<ListagemPostsResponseDTO> sucesso = SucessoPadraoDTO.<ListagemPostsResponseDTO>builder()
-                .codigo("LISTAGEM_POSTS_SUCESSO")
-                .mensagem("Posts listados com sucesso")
-                .dados(new ListagemPostsResponseDTO(dtos))
-                .build();
-        return ResponseEntity.ok(sucesso);
+        ListagemPostsResponseDTO resposta = new ListagemPostsResponseDTO("LISTAGEM_POSTS_SUCESSO", "Posts listados com sucesso", dtos);
+        return ResponseEntity.ok(resposta);
     }
 
     @PatchMapping("/{id-post}")
