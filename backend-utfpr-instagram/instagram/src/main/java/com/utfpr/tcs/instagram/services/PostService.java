@@ -57,7 +57,8 @@ public class PostService {
         // Encontrar o post apenas para o dono especifico. Se for "qualquer post", poderia ser diferente,
         // Mas a rota é /usuarios/{donoId}/posts/{idPost}
         Post post = postRepository.findByIdAndUsuarioIdAndAtivoTrue(idPost, donoId)
-                .orElseThrow(() -> new RuntimeException("Post não encontrado."));
+                .orElseGet(() -> postRepository.findByIdAndAtivoTrue(idPost)
+                        .orElseThrow(() -> new RuntimeException("Post não encontrado.")));
         
         Usuario autorCurtida = usuarioService.obterPorId(usuarioId);
         
